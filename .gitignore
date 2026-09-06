@@ -38,6 +38,7 @@ config/google-service-account.json
 !/storage/framework/sessions/.gitignore
 /storage/framework/views/*
 !/storage/framework/views/.gitignore
+/storage/framework/testing/
 
 !/storage/logs/.gitignore
 
@@ -61,6 +62,7 @@ config/google-service-account.json
 /storage/app/simple-imports/
 /storage/app/testing/
 /storage/app/codex/
+/storage/app/installed.lock
 /storage/app/*.php
 /storage/app/*.jpg
 /storage/app/*.jpeg
