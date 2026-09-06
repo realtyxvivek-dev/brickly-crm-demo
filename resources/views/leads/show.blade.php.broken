@@ -1,0 +1,2467 @@
+@php
+    $user = auth()->user();
+@endphp
+@extends($layout ?? 'layouts.app')
+
+@section('title', $lead->name . ' - Lead Details')
+@section('page-title', 'Lead Details')
+
+@section('content')
+<div class="space-y-6 lead-detail-container" style="width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box;">
+    <!-- Professional Header Section -->
+    <div class="bg-gradient-to-r from-[#063A1C] via-[#205A44] to-[#063A1C] rounded-2xl shadow-xl border border-emerald-800/20 overflow-hidden mb-6">
+        <div class="p-4 sm:p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
+                <div class="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-sm border-2 border-white/20 flex items-center justify-center text-white text-xl sm:text-2xl md:text-3xl font-bold shadow-lg flex-shrink-0">
+                        {{ strtoupper(substr($lead->name, 0, 1)) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight break-words word-wrap">{{ $lead->name }}</h1>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 sm:mt-3">
+                            <a href="tel:{{ $lead->phone }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white text-xs sm:text-sm md:text-base font-medium transition-all duration-200 border border-white/20 shadow-sm whitespace-nowrap">
+                                <i class="fas fa-phone text-xs sm:text-sm"></i>
+                                <span class="truncate max-w-[120px] sm:max-w-none">{{ $lead->phone }}</span>
+                            </a>
+                            @if($lead->email)
+                            <a href="mailto:{{ $lead->email }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white text-xs sm:text-sm md:text-base font-medium transition-all duration-200 border border-white/20 shadow-sm whitespace-nowrap">
+                                <i class="fas fa-envelope text-xs sm:text-sm"></i>
+                                <span class="hidden sm:inline truncate max-w-xs">{{ $lead->email }}</span>
+                                <span class="sm:hidden">Email</span>
+                            </a>
+                            @endif
+                            <span class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold whitespace-nowrap {{
+                                $lead->status === 'dead' ? 'bg-red-500/20 text-red-100 border border-red-400/30' : 
+                                ($lead->status === 'closed' ? 'bg-green-500/20 text-green-100 border border-green-400/30' : 
+                                'bg-blue-500/20 text-blue-100 border border-blue-400/30') 
+                            }}">
+                                {{ ucfirst(str_replace('_', ' ', $lead->status)) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="{{ route('leads.index') }}" class="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white text-xs sm:text-sm font-medium transition-all duration-200 border border-white/20 shadow-sm whitespace-nowrap">
+                        <i class="fas fa-arrow-left mr-1.5 sm:mr-2"></i><span class="hidden sm:inline">Back</span><span class="sm:hidden">Back</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Section -->
+            <div class="pt-4 sm:pt-6 border-t border-white/10">
+                <h3 class="text-xs sm:text-sm font-semibold text-white/90 mb-3 sm:mb-4 uppercase tracking-wider">Quick Actions</h3>
+                <div class="flex flex-wrap gap-2 sm:gap-3">
+                    <!-- Call Button -->
+                    <button onclick="openCallModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[80px] sm:min-w-0">
+                        <i class="fas fa-phone text-xs sm:text-sm"></i>
+                        <span>Call</span>
+                    </button>
+                    
+                    <!-- WhatsApp Button -->
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $lead->phone) }}?text=Hello%20{{ urlencode($lead->name) }}" 
+                       target="_blank"
+                       class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[100px] sm:min-w-0">
+                        <i class="fab fa-whatsapp text-xs sm:text-sm"></i>
+                        <span>WhatsApp</span>
+                    </a>
+                    
+                    <!-- Follow-up Button -->
+                    <button onclick="openFollowupModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[100px] sm:min-w-0">
+                        <i class="fas fa-calendar-check text-xs sm:text-sm"></i>
+                        <span>Follow-up</span>
+                    </button>
+                    
+                    <!-- Site Visit Button -->
+                    <button onclick="openSiteVisitModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[110px] sm:min-w-0">
+                        <i class="fas fa-map-marker-alt text-xs sm:text-sm"></i>
+                        <span>Site Visit</span>
+                    </button>
+                    
+                    <!-- Meeting Button -->
+                    <button onclick="openMeetingModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[100px] sm:min-w-0">
+                        <i class="fas fa-handshake text-xs sm:text-sm"></i>
+                        <span>Meeting</span>
+                    </button>
+                    
+                    <!-- Schedule Call Task Button -->
+                    <button onclick="openScheduleCallTaskModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[120px] sm:min-w-0">
+                        <i class="fas fa-calendar-alt text-xs sm:text-sm"></i>
+                        <span>Schedule Task</span>
+                    </button>
+
+                    @if($user && ($user->isAdmin() || $user->isCrm()))
+                    <button onclick="openOwnerTransferModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[130px] sm:min-w-0">
+                        <i class="fas fa-user-edit text-xs sm:text-sm"></i>
+                        <span>Change Owner</span>
+                    </button>
+                    <form method="POST" action="{{ route('leads.destroy', $lead->id) }}" class="inline" onsubmit="return confirm('Remove this lead from the list? It will be moved to trash and can be recovered.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-red-600/90 hover:bg-red-700 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-red-500/50 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[120px] sm:min-w-0">
+                            <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
+                            <span>Delete lead</span>
+                        </button>
+                    </form>
+                    @endif
+                    
+                    <!-- Edit Requirements Button - Show for roles that can use centralized form -->
+                    @if($user)
+                        <button onclick="openLeadRequirementsModal({{ $lead->id }})" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg transition-all duration-200 border border-white/20 shadow-sm font-medium text-xs sm:text-sm whitespace-nowrap min-w-[140px] sm:min-w-0">
+                            <i class="fas fa-edit text-xs sm:text-sm"></i>
+                            <span>Edit Requirements</span>
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6" style="width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+        <!-- Lead Information Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-md border border-slate-200/80 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-1">Lead Information</p>
+                        <h2 class="text-xl md:text-2xl font-bold text-slate-900">Contact Details</h2>
+                    </div>
+                    <div class="hidden md:flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 text-white shadow-sm">
+                        <i class="fas fa-user-circle text-lg"></i>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 sm:space-y-4 md:space-y-5">
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Name</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ $lead->name }}</p>
+                    </div>
+                    
+                    @if($lead->email)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Email</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-all">
+                            <a href="mailto:{{ $lead->email }}" class="text-blue-600 hover:text-blue-700 hover:underline transition-colors break-all">
+                                {{ $lead->email }}
+                            </a>
+                        </p>
+                    </div>
+                    @endif
+                    
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Phone</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">
+                            <a href="tel:{{ $lead->phone }}" class="text-blue-600 hover:text-blue-700 hover:underline transition-colors break-words">
+                                {{ $lead->phone }}
+                            </a>
+                        </p>
+                    </div>
+                    
+                    @if($lead->address)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Address</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ $lead->address }}</p>
+                        @if($lead->city || $lead->state || $lead->pincode)
+                            <p class="text-xs sm:text-sm text-slate-600 mt-1 break-words">
+                                {{ trim(implode(', ', array_filter([$lead->city, $lead->state, $lead->pincode]))) }}
+                            </p>
+                        @endif
+                    </div>
+                    @endif
+                    
+                    @if($lead->source)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Source</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ ucfirst(str_replace('_', ' ', $lead->source)) }}</p>
+                    </div>
+                    @endif
+                    
+                    @if($lead->budget)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Budget</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ $lead->budget }}</p>
+                    </div>
+                    @endif
+                    
+                    @if($lead->property_type)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Property Type</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ ucfirst($lead->property_type) }}</p>
+                    </div>
+                    @endif
+                    
+                    @php
+                        $allInterestedProjects = collect();
+                        foreach ($lead->prospects as $prospect) {
+                            if ($prospect->interestedProjects) {
+                                $allInterestedProjects = $allInterestedProjects->merge($prospect->interestedProjects);
+                            }
+                        }
+                        $uniqueProjects = $allInterestedProjects->unique('id');
+                        $uniqueProjectNames = $uniqueProjects->pluck('name')->toArray();
+                    @endphp
+                    
+                    @if($uniqueProjects->count() > 0)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-2 sm:mb-3">Interested Projects</p>
+                        <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                            @foreach($uniqueProjects as $project)
+                                <span class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold bg-gradient-to-r from-slate-600 to-slate-700 text-white shadow-sm break-words">
+                                    {{ $project->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Created By</p>
+                        <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ $lead->creator->name ?? 'N/A' }}</p>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">{{ $lead->created_at->format('M d, Y h:i A') }}</p>
+                    </div>
+                    
+                    @if($lead->activeAssignments->count() > 0)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Assigned To</p>
+                        <div class="space-y-1.5 sm:space-y-2">
+                            @foreach($lead->activeAssignments as $assignment)
+                                <p class="text-sm sm:text-base font-semibold text-slate-900 break-words">{{ $assignment->assignedTo->name ?? 'N/A' }}</p>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <!-- Response Time Section -->
+                    @if(isset($responseTimeData) && $responseTimeData['assigned_at'])
+                    <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/70 mt-4">
+                        <h3 class="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-clock text-blue-600"></i>
+                            Response Time
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1">Assigned At</p>
+                                <p class="text-sm font-semibold text-slate-900">
+                                    {{ $responseTimeData['assigned_at']->format('M d, Y h:i A') }}
+                                </p>
+                            </div>
+                            @if($responseTimeData['called_at'])
+                            <div>
+                                <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1">Called At</p>
+                                <p class="text-sm font-semibold text-slate-900">
+                                    {{ $responseTimeData['called_at']->format('M d, Y h:i A') }}
+                                </p>
+                            </div>
+                            @if($responseTimeData['response_time_minutes'] !== null)
+                            <div>
+                                <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1">Response Time</p>
+                                <p class="text-base font-bold text-blue-600">
+                                    @if($responseTimeData['response_time_minutes'] < 60)
+                                        {{ $responseTimeData['response_time_minutes'] }} minutes
+                                    @else
+                                        {{ floor($responseTimeData['response_time_minutes'] / 60) }}h {{ $responseTimeData['response_time_minutes'] % 60 }}m
+                                    @endif
+                                </p>
+                            </div>
+                            @endif
+                            @else
+                            <div>
+                                <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1">Status</p>
+                                <p class="text-sm font-semibold text-orange-600">Not Called Yet</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    
+                    @if($lead->notes)
+                    <div class="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/70">
+                        <p class="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-1.5 sm:mb-2">Notes</p>
+                        <p class="text-xs sm:text-sm text-slate-900 whitespace-pre-wrap leading-relaxed break-words">{{ $lead->notes }}</p>
+                    </div>
+                    @endif
+                    
+                    <!-- Source Information -->
+                    @php
+                        $sourceInfo = [];
+                        $sheetAssignment = $lead->activeAssignments->firstWhere('sheet_config_id', '!=', null);
+                        if ($sheetAssignment && $sheetAssignment->sheetConfig) {
+                            $sourceInfo['type'] = 'Google Sheets';
+                            $sourceInfo['sheet_name'] = $sheetAssignment->sheetConfig->sheet_name;
+                            $sourceInfo['sheet_id'] = $sheetAssignment->sheetConfig->sheet_id;
+                            $sourceInfo['row_number'] = $sheetAssignment->sheet_row_number;
+                        } elseif ($lead->source === 'google_sheets') {
+                            $sourceInfo['type'] = 'Google Sheets';
+                        } elseif ($lead->source === 'pabbly') {
+                            $sourceInfo['type'] = 'Meta/Facebook (via Pabbly)';
+                        } elseif ($lead->source === 'csv') {
+                            $sourceInfo['type'] = 'CSV Import';
+                        } else {
+                            $sourceInfo['type'] = ucfirst(str_replace('_', ' ', $lead->source ?? 'Other'));
+                        }
+                        
+                        // Get form field values for source tracking (excluding sheet_name and sheet_id as per user request)
+                        $sourceFields = $lead->formFieldValues()->whereIn('field_key', [
+                            'source_row_number'
+                        ])->get()->keyBy('field_key');
+
+                        if ($sourceFields->has('source_row_number')) {
+                            $sourceInfo['row_number'] = $sourceFields['source_row_number']->field_value;
+                        }
+                    @endphp
+                    
+                    @if(!empty($sourceInfo) && isset($sourceInfo['type']))
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 mt-4">
+                        <p class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-500 mb-3">Source Information</p>
+                        <div class="space-y-2">
+                            <div>
+                                <p class="text-xs text-slate-500 mb-1">Type</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ $sourceInfo['type'] ?? 'N/A' }}</p>
+                            </div>
+                            @if(isset($sourceInfo['row_number']))
+                            <div>
+                                <p class="text-xs text-slate-500 mb-1">Row Number</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ $sourceInfo['row_number'] }}</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Form Data / Custom Fields -->
+            @php
+                $formFieldValues = $lead->formFieldValues()
+                    ->whereNotIn('field_key', ['source_sheet_name', 'source_sheet_id', 'source_row_number'])
+                    ->orderBy('created_at')
+                    ->get()
+                    ->groupBy(function($fv) {
+                        // Group by source: meta_* for Meta/Facebook, custom_* for custom, etc.
+                        if (str_starts_with($fv->field_key, 'meta_')) {
+                            return 'Meta/Facebook Form';
+                        } elseif (str_starts_with($fv->field_key, 'custom_')) {
+                            return 'Custom Fields';
+                        } else {
+                            return 'Other Fields';
+                        }
+                    });
+            @endphp
+            
+            @if($formFieldValues->isNotEmpty())
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200/80 p-6 md:p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Form Data</p>
+                        <h2 class="text-xl md:text-2xl font-bold text-slate-900">Additional Information</h2>
+                    </div>
+                    <div class="hidden md:flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 text-white shadow-sm">
+                        <i class="fas fa-list-alt"></i>
+                    </div>
+                </div>
+                <div class="space-y-5">
+                    @foreach($formFieldValues as $groupName => $fields)
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-sm font-semibold uppercase">
+                                {{ substr($groupName, 0, 1) }}
+                            </div>
+                            <h3 class="text-sm md:text-base font-semibold text-slate-800">{{ $groupName }}</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            @foreach($fields as $fieldValue)
+                            @php
+                                $fieldConfig = $fieldValue->fieldConfig();
+                                $displayLabel = $fieldConfig ? $fieldConfig->field_label : str_replace('_', ' ', ucfirst(str_replace(['meta_', 'custom_'], '', $fieldValue->field_key)));
+                                $fieldValueText = $fieldValue->field_value ?? 'N/A';
+                                
+                                // Determine icon based on field key
+                                $icon = 'fa-file-alt';
+                                $fieldKeyLower = strtolower($fieldValue->field_key);
+                                if (str_contains($fieldKeyLower, 'name') || str_contains($fieldKeyLower, 'ad')) {
+                                    $icon = 'fa-building';
+                                } elseif (str_contains($fieldKeyLower, 'budget') || str_contains($fieldKeyLower, 'price') || str_contains($fieldKeyLower, 'amount')) {
+                                    $icon = 'fa-money-bill-wave';
+                                } elseif (str_contains($fieldKeyLower, 'email')) {
+                                    $icon = 'fa-envelope';
+                                } elseif (str_contains($fieldKeyLower, 'phone') || str_contains($fieldKeyLower, 'mobile')) {
+                                    $icon = 'fa-phone';
+                                } elseif (str_contains($fieldKeyLower, 'location') || str_contains($fieldKeyLower, 'address') || str_contains($fieldKeyLower, 'city') || str_contains($fieldKeyLower, 'lucknow')) {
+                                    $icon = 'fa-map-marker-alt';
+                                } elseif (str_contains($fieldKeyLower, 'property') || str_contains($fieldKeyLower, 'plot') || str_contains($fieldKeyLower, 'villa')) {
+                                    $icon = 'fa-home';
+                                } elseif (str_contains($fieldKeyLower, 'purpose') || str_contains($fieldKeyLower, 'use')) {
+                                    $icon = 'fa-key';
+                                } elseif (str_contains($fieldKeyLower, 'job') || str_contains($fieldKeyLower, 'title') || str_contains($fieldKeyLower, 'occupation')) {
+                                    $icon = 'fa-briefcase';
+                                } elseif (str_contains($fieldKeyLower, 'buy') || str_contains($fieldKeyLower, 'when') || str_contains($fieldKeyLower, 'time')) {
+                                    $icon = 'fa-calendar';
+                                } elseif (str_contains($fieldKeyLower, 'row') || str_contains($fieldKeyLower, 'number')) {
+                                    $icon = 'fa-hashtag';
+                                }
+                                
+                                // Check if value should be displayed as a badge/pill
+                                $isBadgeValue = in_array(strtolower($fieldValueText), ['yes', 'no', 'end use / reside', 'end_use_/_reside', 'plots_/_villas', 'plots & villas', 'within_month', 'within a month', 'immediate_use_(_1_yr)', 'immediate use (1 yr)']) || 
+                                               str_contains(strtolower($fieldValueText), '₹') || 
+                                               str_contains(strtolower($fieldValueText), 'lk') || 
+                                               str_contains(strtolower($fieldValueText), 'cr');
+                            @endphp
+                            <div class="p-4 rounded-xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas {{ $icon }} text-slate-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-2">
+                                            {{ $displayLabel }}
+                                        </p>
+                                        @if($isBadgeValue)
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                            {{ $fieldValueText }}
+                                        </span>
+                                        @elseif(str_contains(strtolower($fieldValueText), '@') && str_contains(strtolower($fieldValueText), '.'))
+                                        <a href="mailto:{{ $fieldValueText }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline break-all">
+                                            {{ $fieldValueText }}
+                                        </a>
+                                        @else
+                                        <p class="text-sm font-semibold text-slate-900 leading-snug break-words">
+                                            {{ $fieldValueText }}
+                                        </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            <!-- Quick Stats -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Stats</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Calls</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $lead->tasks()->where('task_type', 'calling')->count() + $lead->managerTasks()->where('type', 'phone_call')->count() }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Site Visits</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $lead->siteVisits->count() }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Follow-ups</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $lead->followUps->count() }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Meetings</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $lead->meetings->count() }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Activity Timeline</h2>
+                
+                @if($timeline->count() > 0)
+                    <div class="relative">
+                        <!-- Timeline Line -->
+                        <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="space-y-6">
+                            @php
+                                $currentDate = null;
+                            @endphp
+                            
+                            @foreach($timeline as $activity)
+                                @php
+                                    $activityDate = $activity['timestamp']->format('Y-m-d');
+                                    $showDateHeader = $currentDate !== $activityDate;
+                                    if ($showDateHeader) {
+                                        $currentDate = $activityDate;
+                                    }
+                                @endphp
+                                
+                                @if($showDateHeader)
+                                    <div class="relative">
+                                        <div class="flex items-center mb-4">
+                                            <div class="flex-1 border-t border-gray-200"></div>
+                                            <span class="px-4 text-sm font-semibold text-gray-500">
+                                                @if($activity['timestamp']->isToday())
+                                                    Today
+                                                @elseif($activity['timestamp']->isYesterday())
+                                                    Yesterday
+                                                @elseif($activity['timestamp']->isCurrentWeek())
+                                                    {{ $activity['timestamp']->format('l, M d') }}
+                                                @else
+                                                    {{ $activity['timestamp']->format('M d, Y') }}
+                                                @endif
+                                            </span>
+                                            <div class="flex-1 border-t border-gray-200"></div>
+                                        </div>
+                                    </div>
+                                @endif
+                                
+                                <div class="relative pl-16 pb-6">
+                                    <!-- Timeline Dot -->
+                                    <div class="absolute left-0 top-1">
+                                        <div class="w-12 h-12 rounded-full border-4 border-white shadow-md flex items-center justify-center" style="background-color: {{ $activity['color'] }}20;">
+                                            <i class="fas {{ $activity['icon'] }} text-sm" style="color: {{ $activity['color'] }};"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Activity Card -->
+                                    <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex-1">
+                                                <h3 class="font-semibold text-gray-900 mb-1">{{ $activity['title'] }}</h3>
+                                                <p class="text-sm text-gray-600 mb-2">{{ $activity['description'] }}</p>
+                                                
+                                                @if(isset($activity['metadata']) && !empty($activity['metadata']))
+                                                    <div class="mt-2 space-y-1">
+                                                        @if(isset($activity['metadata']['status']))
+                                                            <span class="inline-block px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+                                                                Status: {{ ucfirst($activity['metadata']['status']) }}
+                                                            </span>
+                                                        @endif
+                                                        @if(isset($activity['metadata']['duration']))
+                                                            <span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                                                                Duration: {{ $activity['metadata']['duration'] }}
+                                                            </span>
+                                                        @endif
+                                                        @if(isset($activity['metadata']['lead_score']))
+                                                            <span class="inline-block px-2 py-1 text-xs rounded bg-purple-100 text-purple-800">
+                                                                Lead Score: {{ $activity['metadata']['lead_score'] }}/5
+                                                            </span>
+                                                        @endif
+                                                        @if(isset($activity['metadata']['recording_url']) && $activity['metadata']['recording_url'])
+                                                            <div style="margin-top:10px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:10px 14px;">
+                                                                <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+                                                                    <i class="fas fa-microphone" style="color:#16a34a;font-size:12px;"></i>
+                                                                    <span style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.5px;">Call Recording</span>
+                                                                </div>
+                                                                <audio controls style="width:100%;height:36px;border-radius:8px;outline:none;">
+                                                                    <source src="{{ $activity['metadata']['recording_url'] }}" type="audio/wav">
+                                                                    <source src="{{ $activity['metadata']['recording_url'] }}" type="audio/mpeg">
+                                                                    Your browser does not support audio.
+                                                                </audio>
+                                                                <div style="margin-top:5px;text-align:right;">
+                                                                    <a href="{{ $activity['metadata']['recording_url'] }}" target="_blank"
+                                                                       style="font-size:11px;color:#16a34a;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                                                                        <i class="fas fa-download" style="font-size:10px;"></i> Download
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="text-right ml-4">
+                                                <p class="text-xs text-gray-500">
+                                                    {{ $activity['timestamp']->format('h:i A') }}
+                                                </p>
+                                                @if($activity['user'])
+                                                    <p class="text-xs text-gray-400 mt-1">
+                                                        by {{ $activity['user']->name }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <i class="fas fa-history text-gray-300 text-6xl mb-4"></i>
+                        <p class="text-gray-500">No activities found for this lead.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for Quick Actions -->
+<!-- Call Modal -->
+<div id="callModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Log Call</h3>
+                <button onclick="closeCallModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="callForm" onsubmit="submitCall(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Call Type *</label>
+                        <select name="call_type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="outgoing">Outgoing</option>
+                            <option value="incoming">Incoming</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                        <input type="text" name="phone_number" value="{{ $lead->phone }}" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Time *</label>
+                            <input type="datetime-local" name="start_time" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (seconds) *</label>
+                            <input type="number" name="duration" min="0" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Call Outcome</label>
+                        <select name="call_outcome" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select outcome</option>
+                            <option value="interested">Interested</option>
+                            <option value="not_interested">Not Interested</option>
+                            <option value="callback">Callback</option>
+                            <option value="no_answer">No Answer</option>
+                            <option value="busy">Busy</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeCallModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Log Call</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Follow-up Modal -->
+<div id="followupModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Schedule Follow-up</h3>
+                <button onclick="closeFollowupModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="followupForm" onsubmit="submitFollowup(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                        <select name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="call">Call</option>
+                            <option value="email">Email</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="site_visit">Site Visit</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Scheduled Date & Time *</label>
+                        <input type="datetime-local" name="scheduled_at" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes *</label>
+                        <textarea name="notes" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeFollowupModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Site Visit Modal -->
+<div id="siteVisitModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Schedule Site Visit</h3>
+                <button onclick="closeSiteVisitModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="siteVisitForm" onsubmit="submitSiteVisit(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Scheduled Date & Time *</label>
+                        <input type="datetime-local" name="scheduled_at" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                        <div id="siteVisitProjectTagsContainer" class="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-lg min-h-[42px] bg-white">
+                            <!-- Tags will be dynamically added here -->
+                        </div>
+                        <input type="text" 
+                               id="siteVisitProjectInput" 
+                               placeholder="Type project name and press Enter"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 mt-2">
+                        <input type="hidden" name="project" id="siteVisitProjectHidden">
+                        <small class="text-xs text-gray-500 mt-1 block">Press Enter to add project</small>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Visit Notes</label>
+                        <textarea name="visit_notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeSiteVisitModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#063A1C] to-[#205A44] text-white rounded-lg hover:from-[#052814] hover:to-[#1a4936] transition-all duration-200">Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Call Task Modal -->
+<div id="scheduleCallTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Schedule Call Task</h3>
+                <button onclick="closeScheduleCallTaskModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="scheduleCallTaskForm" onsubmit="submitScheduleCallTask(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Scheduled Date & Time *</label>
+                        <input type="datetime-local" name="scheduled_at" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <small class="text-xs text-gray-500 mt-1 block">Select when you want to make the call</small>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Notes (Optional)</label>
+                        <textarea name="notes" rows="3" placeholder="Add any notes or reminders for this call task..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeScheduleCallTaskModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#063A1C] to-[#205A44] text-white rounded-lg hover:from-[#205A44] hover:to-[#15803d] transition-all duration-200">Schedule Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if($user && ($user->isAdmin() || $user->isCrm()))
+@php
+    $currentOwnerId = optional($lead->activeAssignments->first())->assigned_to;
+@endphp
+<div id="ownerTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Change Lead Owner</h3>
+                <button onclick="closeOwnerTransferModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="ownerTransferForm" onsubmit="submitOwnerTransfer(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">New Owner *</label>
+                        <select id="ownerTransferAssignedTo" name="assigned_to" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="">Select user</option>
+                            @foreach(($ownerTransferUsers ?? collect()) as $transferUser)
+                                <option value="{{ $transferUser->id }}" {{ (int) $currentOwnerId === (int) $transferUser->id ? 'selected' : '' }}>
+                                    {{ $transferUser->name }} ({{ $transferUser->role->name ?? 'User' }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" id="ownerTransferCreateCallingTask" name="create_calling_task" checked class="mt-1">
+                            <span class="text-sm text-gray-700">Create calling task for new owner</span>
+                        </label>
+                    </div>
+                    <input type="hidden" id="ownerTransferExistingTasks" name="transfer_existing_tasks" value="1">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+                        <textarea id="ownerTransferNotes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Reason for owner change"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeOwnerTransferModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#063A1C] to-[#205A44] text-white rounded-lg hover:from-[#205A44] hover:to-[#15803d] transition-all duration-200">Transfer Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Simplified Meeting Modal -->
+<div id="meetingModal" class="fixed inset-0 bg-black bg-opacity-60 hidden h-full w-full z-50 flex items-center justify-center" style="backdrop-filter: blur(3px);">
+    <div class="w-full max-w-2xl mx-3 sm:mx-0">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <!-- Header with gradient -->
+            <div class="bg-gradient-to-r from-green-800 to-green-600 px-6 py-5 rounded-t-2xl w-full">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Schedule Meeting</h3>
+                    </div>
+                    <button onclick="closeMeetingModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-2 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form Body -->
+            <form id="meetingForm" onsubmit="submitMeeting(event)" class="flex flex-col flex-1 min-h-0">
+                <div class="px-6 py-5 overflow-y-auto flex-1">
+                    <div class="space-y-4">
+                        <!-- Meeting Type -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-tag text-green-600 mr-1"></i> Meeting Type
+                            </label>
+                            <select id="meeting_sequence" name="meeting_sequence" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white transition">
+                                <option value="1">🎯 Fresh Meeting (1st)</option>
+                                <option value="2">🔄 2nd Meeting</option>
+                                <option value="3">⭐ 3rd Meeting</option>
+                            </select>
+                        </div>
+
+                        <!-- Date & Time -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-clock text-green-600 mr-1"></i> Scheduled Date & Time
+                            </label>
+                            <input type="datetime-local" name="scheduled_at" id="scheduled_at" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                        </div>
+
+                        <!-- Meeting Mode -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                <i class="fas fa-video text-green-600 mr-1"></i> Meeting Mode
+                            </label>
+                            <div class="flex gap-3">
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="meeting_mode" value="online" class="hidden peer" onchange="toggleMeetingModeFields()">
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-xl peer-checked:border-green-600 peer-checked:bg-green-50 peer-checked:text-green-700 transition hover:border-gray-300">
+                                        <i class="fas fa-video"></i>
+                                        <span class="font-medium">Online</span>
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="meeting_mode" value="offline" checked class="hidden peer" onchange="toggleMeetingModeFields()">
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-xl peer-checked:border-green-600 peer-checked:bg-green-50 peer-checked:text-green-700 transition hover:border-gray-300">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span class="font-medium">Offline</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Conditional: Online = Link -->
+                        <div id="onlineFields" style="display:none;" class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-link text-green-600 mr-1"></i> Meeting Link (Optional)
+                            </label>
+                            <input type="url" name="meeting_link" placeholder="https://meet.google.com/..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                        </div>
+
+                        <!-- Conditional: Offline = Location -->
+                        <div id="offlineFields" class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-map-marker-alt text-green-600 mr-1"></i> Location
+                            </label>
+                            <input type="text" name="location" id="location_input" placeholder="Office address, project site, etc." class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                        </div>
+
+                        <!-- Remember Me Checkbox -->
+                        <div class="form-group bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border-2 border-green-100">
+                            <label class="flex items-start cursor-pointer group">
+                                <input type="checkbox" name="reminder_enabled" checked class="mt-1 mr-3 w-5 h-5 text-green-600 rounded border-2 border-green-300 focus:ring-green-500">
+                                <div>
+                                    <span class="text-sm font-semibold text-green-900 group-hover:text-green-700 transition">
+                                        <i class="fas fa-bell text-green-600 mr-1"></i> Remind me before meeting
+                                    </span>
+                                    <p class="text-xs text-green-700 mt-1">Get a calling task 5 minutes before the meeting time</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Meeting Notes -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-sticky-note text-green-600 mr-1"></i> Meeting Notes (Optional)
+                            </label>
+                            <textarea name="meeting_notes" rows="3" placeholder="Add any additional notes or agenda..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer with buttons -->
+                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex gap-3 shrink-0">
+                    <button type="button" onclick="closeMeetingModal()" class="flex-1 h-12 bg-white border-2 border-green-700 rounded-lg text-green-800 hover:bg-green-50 font-semibold transition-all shadow-sm flex items-center justify-center">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="flex-1 h-12 bg-gradient-to-r from-green-700 to-green-600 text-white rounded-lg hover:from-green-800 hover:to-green-700 font-semibold transition-all shadow-md hover:shadow-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-check mr-2"></i>Schedule Meeting
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Include Meeting Post-Call Popup Component -->
+@include('components.meeting-post-call-popup')
+
+
+{{-- Lead Requirements Modal --}}
+<div id="leadRequirementsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Lead Detail Form</h2>
+            <button onclick="closeLeadRequirementsModal()" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+        </div>
+        <div id="leadReqFormBody" class="overflow-y-auto px-6 py-4 flex-1">
+            <div id="leadReqLoading" class="text-center py-10 text-slate-400">Loading...</div>
+            <div id="leadReqFormContent" class="hidden space-y-4"></div>
+            <div id="leadReqError" class="hidden text-red-500 text-sm py-4"></div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <button onclick="closeLeadRequirementsModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 text-sm">Cancel</button>
+            <button onclick="submitLeadRequirements()" id="leadReqSubmitBtn" class="px-4 py-2 rounded-lg bg-green-700 hover:bg-green-800 text-white text-sm font-medium">Save Requirements</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let currentLeadId = null;
+let currentFormFields = [];
+
+window.openLeadRequirementsModal = async function openLeadRequirementsModal(leadId) {
+    currentLeadId = leadId;
+    document.getElementById('leadRequirementsModal').classList.remove('hidden');
+    document.getElementById('leadRequirementsModal').classList.add('flex');
+    document.getElementById('leadReqLoading').classList.remove('hidden');
+    document.getElementById('leadReqFormContent').classList.add('hidden');
+    document.getElementById('leadReqError').classList.add('hidden');
+
+    try {
+        const token = document.querySelector('meta[name="csrf-token"]')?.content;
+        const res = await fetch(`/api/leads/${leadId}/requirement-form`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': token
+            }
+        });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || 'Failed to load form');
+
+        currentFormFields = data.form_fields || [];
+        renderLeadReqFormFromManager(data);
+
+        document.getElementById('leadReqLoading').classList.add('hidden');
+        document.getElementById('leadReqFormContent').classList.remove('hidden');
+    } catch (e) {
+        document.getElementById('leadReqLoading').classList.add('hidden');
+        document.getElementById('leadReqError').textContent = e.message;
+        document.getElementById('leadReqError').classList.remove('hidden');
+    }
+}
+
+function renderLeadReqFormFromManager(data) {
+    // Temporarily swap container so renderManagerLeadForm renders into our modal
+    const realContainer = document.getElementById('leadReqFormContent');
+    // Create a fake managerLeadFormContainer if not exists
+    let fakeContainer = document.getElementById('managerLeadFormContainer');
+    if (!fakeContainer) {
+        fakeContainer = document.createElement('div');
+        fakeContainer.id = 'managerLeadFormContainer';
+        fakeContainer.style.display = 'none';
+        document.body.appendChild(fakeContainer);
+    }
+    // Also need currentTaskId — set to null for lead-only mode
+    window.currentTaskId = null;
+    // Render into fake container first
+    renderManagerLeadForm(data);
+    // Move rendered content to our modal container
+    realContainer.innerHTML = fakeContainer.innerHTML;
+    fakeContainer.innerHTML = '';
+    // Re-init category->type dependent field
+    const cat = realContainer.querySelector('#manager_form_category');
+    const type = realContainer.querySelector('#manager_form_type');
+    if (cat && cat.value && type) {
+        updateManagerTypeOptions(cat.value, type, data.form_values?.type || '');
+    }
+}
+
+function closeLeadRequirementsModal() {
+    document.getElementById('leadRequirementsModal').classList.add('hidden');
+    document.getElementById('leadRequirementsModal').classList.remove('flex');
+    currentLeadId = null;
+    currentFormFields = [];
+}
+
+function renderLeadReqForm(data) {
+    const container = document.getElementById('leadReqFormContent');
+    container.innerHTML = '';
+
+    // Basic info
+    const basicHtml = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Name *</label>
+                <input id="lrf_customer_name" type="text" value="${data.lead_name || ''}"
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Mobile Number *</label>
+                <input id="lrf_phone" type="text" value="${data.lead_phone || ''}"
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+        </div>
+        <hr class="border-slate-200">
+        <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">Lead Requirements</p>`;
+    container.insertAdjacentHTML('beforeend', basicHtml);
+
+    // Dynamic fields
+    const values = data.form_values || {};
+    currentFormFields.forEach(field => {
+        const val = values[field.field_key] || '';
+        let inputHtml = '';
+        const baseClass = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500';
+
+        if (field.field_type === 'select' && field.options?.length) {
+            const opts = field.options.map(o => {
+                const optVal = typeof o === 'object' ? o.value : o;
+                const optLabel = typeof o === 'object' ? o.label : o;
+                return `<option value="${optVal}" ${val == optVal ? 'selected' : ''}>${optLabel}</option>`;
+            }).join('');
+            inputHtml = `<select id="lrf_${field.field_key}" class="${baseClass}"><option value="">-- Select --</option>${opts}</select>`;
+        } else if (field.field_type === 'textarea') {
+            inputHtml = `<textarea id="lrf_${field.field_key}" rows="3" class="${baseClass}">${val}</textarea>`;
+        } else {
+            inputHtml = `<input id="lrf_${field.field_key}" type="text" value="${val}" class="${baseClass}">`;
+        }
+
+        const req = field.is_required ? '<span class="text-red-500">*</span>' : '';
+        container.insertAdjacentHTML('beforeend', `
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">${field.field_label} ${req}</label>
+                ${inputHtml}
+            </div>`);
+    });
+}
+
+async function submitLeadRequirements() {
+    if (!currentLeadId) return;
+    const btn = document.getElementById('leadReqSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const payload = {
+        customer_name: document.getElementById('manager_form_name')?.value,
+        phone: document.getElementById('manager_form_phone')?.value,
+        form_fields: {
+            category:           document.getElementById('manager_form_category')?.value || '',
+            preferred_location: document.getElementById('manager_form_preferred_location')?.value || '',
+            type:               document.getElementById('manager_form_type')?.value || '',
+            purpose:            document.getElementById('manager_form_purpose')?.value || '',
+            possession:         document.getElementById('manager_form_possession')?.value || '',
+            budget:             document.getElementById('manager_form_budget')?.value || '',
+            lead_status:        document.getElementById('manager_form_lead_status')?.value || '',
+            lead_quality:       document.getElementById('manager_form_lead_quality')?.value || '',
+            customer_job:       document.getElementById('manager_form_customer_job')?.value || '',
+            industry_sector:    document.getElementById('manager_form_industry_sector')?.value || '',
+            buying_frequency:   document.getElementById('manager_form_buying_frequency')?.value || '',
+            living_city:        document.getElementById('manager_form_living_city')?.value || '',
+        },
+        _token: document.querySelector('meta[name="csrf-token"]')?.content
+    };
+
+    try {
+        const res = await fetch(`/api/leads/${currentLeadId}/update-requirements`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': payload._token
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Save failed');
+
+        closeLeadRequirementsModal();
+        // Success toast
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+        toast.textContent = 'Requirements saved successfully!';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    } catch (e) {
+        document.getElementById('leadReqError').textContent = e.message;
+        document.getElementById('leadReqError').classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Requirements';
+    }
+}
+
+    function renderManagerLeadForm(data) {
+        const container = document.getElementById('managerLeadFormContainer');
+        
+        // Update modal title based on whether it's a prospect or direct lead
+        const modalTitle = document.querySelector('#managerLeadRequirementFormModal .modal-header h3');
+        if (modalTitle) {
+            const hasProspect = data.has_prospect === true;
+            modalTitle.textContent = hasProspect ? 'Prospect Verification' : 'Lead Detail Form';
+        }
+        
+        const formValues = data.form_values || {};
+        
+        // Get existing values for pre-population
+        const existingCategory = formValues.category || '';
+        const existingPreferredLocation = formValues.preferred_location || '';
+        const existingType = formValues.type || '';
+        const existingPurpose = formValues.purpose || '';
+        const existingPossession = formValues.possession || '';
+        const existingBudget = formValues.budget || '';
+        
+        let formHTML = `
+            <form id="managerLeadRequirementForm" novalidate onsubmit="submitManagerLeadRequirementForm(event); return false;">
+                <input type="hidden" name="task_id" value="${currentTaskId}">
+                
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Name <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="name" 
+                                   id="manager_form_name"
+                                   value="${data.lead_name || ''}"
+                                   required
+                                   placeholder="Enter lead name"
+                                   style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Mobile Number <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <input type="tel" 
+                                   name="phone" 
+                                   id="manager_form_phone"
+                                   value="${data.lead_phone || ''}"
+                                   required
+                                   placeholder="Enter phone number"
+                                   style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">Lead Requirements</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Category Field -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Category <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="category" 
+                                    id="manager_form_category" 
+                                    required
+                                    onchange="handleManagerCategoryChange(this.value)"
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Category --</option>
+                                <option value="Residential" ${existingCategory === 'Residential' ? 'selected' : ''}>Residential</option>
+                                <option value="Commercial" ${existingCategory === 'Commercial' ? 'selected' : ''}>Commercial</option>
+                                <option value="Both" ${existingCategory === 'Both' ? 'selected' : ''}>Both</option>
+                                <option value="N.A" ${existingCategory === 'N.A' ? 'selected' : ''}>N.A</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Preferred Location Field -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Preferred Location <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="preferred_location" 
+                                    id="manager_form_preferred_location" 
+                                    required
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Preferred Location --</option>
+                                <option value="Inside City" ${existingPreferredLocation === 'Inside City' ? 'selected' : ''}>Inside City</option>
+                                <option value="Sitapur Road" ${existingPreferredLocation === 'Sitapur Road' ? 'selected' : ''}>Sitapur Road</option>
+                                <option value="Hardoi Road" ${existingPreferredLocation === 'Hardoi Road' ? 'selected' : ''}>Hardoi Road</option>
+                                <option value="Faizabad Road" ${existingPreferredLocation === 'Faizabad Road' ? 'selected' : ''}>Faizabad Road</option>
+                                <option value="Sultanpur Road" ${existingPreferredLocation === 'Sultanpur Road' ? 'selected' : ''}>Sultanpur Road</option>
+                                <option value="Shaheed Path" ${existingPreferredLocation === 'Shaheed Path' ? 'selected' : ''}>Shaheed Path</option>
+                                <option value="Raebareily Road" ${existingPreferredLocation === 'Raebareily Road' ? 'selected' : ''}>Raebareily Road</option>
+                                <option value="Kanpur Road" ${existingPreferredLocation === 'Kanpur Road' ? 'selected' : ''}>Kanpur Road</option>
+                                <option value="Outer Ring Road" ${existingPreferredLocation === 'Outer Ring Road' ? 'selected' : ''}>Outer Ring Road</option>
+                                <option value="Bijnor Road" ${existingPreferredLocation === 'Bijnor Road' ? 'selected' : ''}>Bijnor Road</option>
+                                <option value="Deva Road" ${existingPreferredLocation === 'Deva Road' ? 'selected' : ''}>Deva Road</option>
+                                <option value="Sushant Golf City" ${existingPreferredLocation === 'Sushant Golf City' ? 'selected' : ''}>Sushant Golf City</option>
+                                <option value="Vrindavan Yojana" ${existingPreferredLocation === 'Vrindavan Yojana' ? 'selected' : ''}>Vrindavan Yojana</option>
+                                <option value="N.A" ${existingPreferredLocation === 'N.A' ? 'selected' : ''}>N.A</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Type Field (dependent on Category) -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Type <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="type" 
+                                    id="manager_form_type" 
+                                    required
+                                    ${!existingCategory ? 'disabled' : ''}
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; ${!existingCategory ? 'background-color: #f5f5f5;' : ''}">
+                                <option value="">-- Select Type (select category first) --</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Purpose Field -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Purpose <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="purpose" 
+                                    id="manager_form_purpose" 
+                                    required
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Purpose --</option>
+                                <option value="End Use" ${existingPurpose === 'End Use' ? 'selected' : ''}>End Use</option>
+                                <option value="Short Term Investment" ${existingPurpose === 'Short Term Investment' ? 'selected' : ''}>Short Term Investment</option>
+                                <option value="Long Term Investment" ${existingPurpose === 'Long Term Investment' ? 'selected' : ''}>Long Term Investment</option>
+                                <option value="Rental Income" ${existingPurpose === 'Rental Income' ? 'selected' : ''}>Rental Income</option>
+                                <option value="Investment + End Use" ${existingPurpose === 'Investment + End Use' ? 'selected' : ''}>Investment + End Use</option>
+                                <option value="N.A" ${existingPurpose === 'N.A' ? 'selected' : ''}>N.A</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Possession Field -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Possession <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="possession" 
+                                    id="manager_form_possession" 
+                                    required
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Possession --</option>
+                                <option value="Under Construction" ${existingPossession === 'Under Construction' ? 'selected' : ''}>Under Construction</option>
+                                <option value="Ready To Move" ${existingPossession === 'Ready To Move' ? 'selected' : ''}>Ready To Move</option>
+                                <option value="Pre Launch" ${existingPossession === 'Pre Launch' ? 'selected' : ''}>Pre Launch</option>
+                                <option value="Both" ${existingPossession === 'Both' ? 'selected' : ''}>Both</option>
+                                <option value="N.A" ${existingPossession === 'N.A' ? 'selected' : ''}>N.A</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Budget Field -->
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                Budget <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="budget" 
+                                    id="manager_form_budget" 
+                                    required
+                                    style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Budget --</option>
+                                <option value="Below 50 Lacs" ${existingBudget === 'Below 50 Lacs' ? 'selected' : ''}>Below 50 Lacs</option>
+                                <option value="50-75 Lacs" ${existingBudget === '50-75 Lacs' ? 'selected' : ''}>50-75 Lacs</option>
+                                <option value="75 Lacs-1 Cr" ${existingBudget === '75 Lacs-1 Cr' ? 'selected' : ''}>75 Lacs-1 Cr</option>
+                                <option value="Above 1 Cr" ${existingBudget === 'Above 1 Cr' ? 'selected' : ''}>Above 1 Cr</option>
+                                <option value="Above 2 Cr" ${existingBudget === 'Above 2 Cr' ? 'selected' : ''}>Above 2 Cr</option>
+                                <option value="N.A" ${existingBudget === 'N.A' ? 'selected' : ''}>N.A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Follow Up Required Section -->
+                <div style="margin-bottom: 24px;">
+                    <div style="padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <input type="checkbox" 
+                                   name="follow_up_required" 
+                                   id="manager_form_follow_up_required"
+                                   style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+                            <label for="manager_form_follow_up_required" style="font-size: 14px; font-weight: 500; color: #333; cursor: pointer; margin: 0;">
+                                <strong>Follow Up Required</strong>
+                            </label>
+                        </div>
+                        <small style="display: block; color: #666; font-size: 12px; margin-left: 28px;">Check this if you need to schedule a follow-up call for this lead</small>
+                        
+                        <!-- Follow Up Date & Time Picker (shown conditionally when Follow Up Required is checked) -->
+                        <div id="followUpDateContainer" style="display: none; margin-top: 16px;">
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                <strong>Follow Up Date & Time</strong> <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <input type="datetime-local" 
+                                   name="follow_up_date" 
+                                   id="manager_form_follow_up_date"
+                                   style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <small style="display: block; margin-top: 4px; color: #666; font-size: 12px;">Select date and time for the follow-up call. A calling task will be created automatically.</small>
+                            
+                            <!-- Create Sales Executive Task Option (shown when Follow Up Required is checked) -->
+                            <div id="createTelecallerTaskContainer" style="display: none; margin-top: 12px;">
+                                <div style="display: flex; align-items: center;">
+                                    <input type="checkbox" 
+                                           name="create_telecaller_task" 
+                                           id="create_telecaller_task_checkbox"
+                                           style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+                                    <label for="create_telecaller_task_checkbox" style="font-size: 14px; font-weight: 500; color: #333; cursor: pointer; margin: 0;">
+                                        Create calling task for Sales Executive also
+                                    </label>
+                                </div>
+                                <small style="display: block; color: #666; font-size: 12px; margin-left: 28px; margin-top: 4px;">
+                                    This will create a calling task for the original Sales Executive who provided this lead
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">Verification Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                <strong>Lead Status</strong> <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="lead_status" id="manager_form_lead_status" required style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Lead Status --</option>
+                                <option value="hot">Hot</option>
+                                <option value="warm">Warm</option>
+                                <option value="cold">Cold</option>
+                                <option value="junk">Junk</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                <strong>Lead Quality</strong> <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <select name="lead_quality" id="manager_form_lead_quality" required style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- Select Lead Quality --</option>
+                                <option value="1">1 - Bad</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5 - Best Lead</option>
+                            </select>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                <strong>Interested Projects</strong> <span style="color: #d32f2f;">*</span>
+                            </label>
+                            <input type="text"
+                                   id="manager_project_input"
+                                   placeholder="Type project name and press Enter"
+                                   style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 12px;">
+                            <div id="project-tags-container" class="project-tags-wrapper">
+                                <div class="project-tags-grid" id="project-tags-grid">
+                                    <!-- Project tags will be loaded dynamically -->
+                                </div>
+                            </div>
+                            <input type="hidden" name="interested_projects" id="manager_form_interested_projects_hidden">
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Profiling Section -->
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e0e0e0;">
+                        <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">Customer Profiling <span style="color: #666; font-weight: 400; font-size: 14px;">(Optional)</span></h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                    Customer Job
+                                </label>
+                                <input type="text" 
+                                       name="customer_job" 
+                                       id="manager_form_customer_job"
+                                       value="${formValues.customer_job || ''}"
+                                       placeholder="Enter customer job / occupation"
+                                       style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                    Industry / Sector
+                                </label>
+                                <select name="industry_sector" 
+                                        id="manager_form_industry_sector"
+                                        style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                    <option value="">-- Select Industry / Sector --</option>
+                                    <option value="IT" ${formValues.industry_sector === 'IT' ? 'selected' : ''}>IT</option>
+                                    <option value="Education" ${formValues.industry_sector === 'Education' ? 'selected' : ''}>Education</option>
+                                    <option value="Healthcare" ${formValues.industry_sector === 'Healthcare' ? 'selected' : ''}>Healthcare</option>
+                                    <option value="Business" ${formValues.industry_sector === 'Business' ? 'selected' : ''}>Business</option>
+                                    <option value="FMCG" ${formValues.industry_sector === 'FMCG' ? 'selected' : ''}>FMCG</option>
+                                    <option value="Government" ${formValues.industry_sector === 'Government' ? 'selected' : ''}>Government</option>
+                                    <option value="Other" ${formValues.industry_sector === 'Other' ? 'selected' : ''}>Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                    Buying Frequency
+                                </label>
+                                <select name="buying_frequency" 
+                                        id="manager_form_buying_frequency"
+                                        style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                    <option value="">-- Select Buying Frequency --</option>
+                                    <option value="Regular" ${formValues.buying_frequency === 'Regular' ? 'selected' : ''}>Regular</option>
+                                    <option value="Occasional" ${formValues.buying_frequency === 'Occasional' ? 'selected' : ''}>Occasional</option>
+                                    <option value="First-time" ${formValues.buying_frequency === 'First-time' ? 'selected' : ''}>First-time</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                    Living City
+                                </label>
+                                <input type="text" 
+                                       name="living_city" 
+                                       id="manager_form_living_city"
+                                       value="${formValues.living_city || ''}"
+                                       placeholder="Enter living city"
+                                       style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                                    City Type
+                                </label>
+                                <select name="city_type" 
+                                        id="manager_form_city_type"
+                                        style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                    <option value="">-- Select City Type --</option>
+                                    <option value="Metro" ${formValues.city_type === 'Metro' ? 'selected' : ''}>Metro</option>
+                                    <option value="Tier 1" ${formValues.city_type === 'Tier 1' ? 'selected' : ''}>Tier 1</option>
+                                    <option value="Tier 2" ${formValues.city_type === 'Tier 2' ? 'selected' : ''}>Tier 2</option>
+                                    <option value="Tier 3" ${formValues.city_type === 'Tier 3' ? 'selected' : ''}>Tier 3</option>
+                                    <option value="Local Resident" ${formValues.city_type === 'Local Resident' ? 'selected' : ''}>Local Resident</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 16px;">
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #333; margin-bottom: 6px;">
+                            <strong>Manager Remark</strong>
+                        </label>
+                        <textarea name="manager_remark" id="manager_form_manager_remark" rows="3" placeholder="Enter remarks or notes..." style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"></textarea>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 24px;">
+                    <button type="button" 
+                            onclick="cancelManagerLeadRequirementForm()" 
+                            style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px; background: white; color: #333; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            style="padding: 10px 20px; background: #205A44; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i>Verify Prospect
+                    </button>
+                </div>
+            </form>
+        `;
+        
+        try {
+            container.innerHTML = formHTML;
+            
+            // Load interested projects
+            loadInterestedProjectsForManager();
+            
+            // Add Enter key handler for custom project input
+            const projectInput = document.getElementById('manager_project_input');
+            if (projectInput) {
+                projectInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = this.value.trim();
+                        if (value) {
+                            addManagerProjectTag(value);
+                            this.value = ''; // Clear input after adding
+                        }
+                    }
+                });
+            }
+            
+            // Initialize dependent fields (category -> type)
+            const categorySelect = document.getElementById('manager_form_category');
+            const typeSelect = document.getElementById('manager_form_type');
+            
+            if (categorySelect && typeSelect) {
+                // Initialize Type field based on existing category
+                if (categorySelect.value) {
+                    updateManagerTypeOptions(categorySelect.value, typeSelect, existingType);
+                }
+            }
+        } catch (error) {
+            console.error('Error inserting form HTML:', error);
+            container.innerHTML = `
+                <div style="padding: 20px; background: #fee; border: 1px solid #fcc; border-radius: 8px; color: #c33;">
+                    <h4 style="margin: 0 0 10px 0;">Error Loading Form</h4>
+                    <p style="margin: 0;">${error.message}</p>
+                </div>
+            `;
+        }
+        
+        // Initialize Follow Up Required checkbox handler
+        const followUpRequiredCheckbox = document.getElementById('manager_form_follow_up_required');
+        if (followUpRequiredCheckbox) {
+            followUpRequiredCheckbox.addEventListener('change', function() {
+                handleFollowUpRequiredChange(this.checked);
+            });
+            // Initialize on page load if checkbox is already checked
+            if (followUpRequiredCheckbox.checked) {
+                handleFollowUpRequiredChange(true);
+            }
+        }
+    }
+    
+    // Handle Follow Up Required checkbox change - show/hide follow-up date picker
+    function handleFollowUpRequiredChange(isRequired) {
+        const followUpContainer = document.getElementById('followUpDateContainer');
+        const followUpDateInput = document.getElementById('manager_form_follow_up_date');
+        const telecallerTaskContainer = document.getElementById('createTelecallerTaskContainer');
+        
+        if (isRequired) {
+            // Show follow-up date picker
+            if (followUpContainer) {
+                followUpContainer.style.display = 'block';
+                followUpContainer.style.visibility = 'visible';
+            }
+            if (followUpDateInput) {
+                followUpDateInput.style.display = 'block';
+                followUpDateInput.style.visibility = 'visible';
+                followUpDateInput.removeAttribute('disabled');
+                followUpDateInput.removeAttribute('readonly');
+                // Don't set required attribute - we'll validate in JavaScript
+                followUpDateInput.removeAttribute('required');
+                followUpDateInput.required = false;
+            }
+            // Show telecaller task checkbox
+            if (telecallerTaskContainer) {
+                telecallerTaskContainer.style.display = 'block';
+            }
+        } else {
+            // Hide follow-up date picker
+            if (followUpContainer) {
+                followUpContainer.style.display = 'none';
+            }
+            if (followUpDateInput) {
+                // Always remove required attribute when hiding to prevent validation error
+                followUpDateInput.removeAttribute('required');
+                followUpDateInput.required = false;
+                followUpDateInput.value = '';
+            }
+            // Hide telecaller task checkbox
+            if (telecallerTaskContainer) {
+                telecallerTaskContainer.style.display = 'none';
+            }
+            // Uncheck telecaller task checkbox when hiding
+            const telecallerTaskCheckbox = document.getElementById('create_telecaller_task_checkbox');
+            if (telecallerTaskCheckbox) {
+                telecallerTaskCheckbox.checked = false;
+            }
+        }
+    }
+
+    // Handle form field changes for manager form
+    function handleManagerFormFieldChange(fieldKey, value, dependentField = null) {
+        if (fieldKey === 'category' && dependentField === 'type') {
+            const typeSelect = document.getElementById('manager_form_type');
+            if (typeSelect) {
+                updateManagerTypeOptions(value, typeSelect);
+            }
+        }
+    }
+
+    // Handle category change for manager form
+    window.handleManagerCategoryChange = function(category) {
+        const typeSelect = document.getElementById('manager_form_type');
+        if (typeSelect) {
+            updateManagerTypeOptions(category, typeSelect);
+        }
+    };
+    
+    // Update type options based on category
+    function updateManagerTypeOptions(category, typeSelect, existingValue = null) {
+        const typeOptions = {
+            'Residential': ['Plots & Villas', 'Apartments', 'Studio', 'Farmhouse', 'N.A'],
+            'Commercial': ['Retail Shops', 'Office Space', 'Studio', 'N.A'],
+            'Both': ['Plots & Villas', 'Apartments', 'Retail Shops', 'Office Space', 'Studio', 'Farmhouse', 'Agricultural', 'Others', 'N.A'],
+            'N.A': ['N.A']
+        };
+        
+        const currentValue = existingValue || typeSelect.value;
+        const options = typeOptions[category] || typeOptions['Both'];
+        
+        // Enable/disable Type field based on category selection
+        if (category && category !== '') {
+            typeSelect.disabled = false;
+            typeSelect.style.backgroundColor = '';
+        } else {
+            typeSelect.disabled = true;
+            typeSelect.style.backgroundColor = '#f5f5f5';
+        }
+        
+        typeSelect.innerHTML = '<option value="">-- Select Type (select category first) --</option>';
+        options.forEach(option => {
+            const selected = option === currentValue ? 'selected' : '';
+            typeSelect.innerHTML += `<option value="${option}" ${selected}>${option}</option>`;
+        });
+        
+        // If current value is not in the new options, clear it
+
+    function handleManagerCategoryChange(value) {
+        const typeSelect = document.getElementById('manager_form_type');
+        if (typeSelect) updateManagerTypeOptions(value, typeSelect);
+    }
+
+    // Close on backdrop click
+document.getElementById('leadRequirementsModal').addEventListener('click', function(e) {
+    if (e.target === this) closeLeadRequirementsModal();
+});
+</script>
+
+<script>
+    // Use window only to avoid duplicate declaration when layout (e.g. telecaller) already defines API_BASE_URL
+    if (typeof window.API_BASE_URL === 'undefined') {
+        window.API_BASE_URL = '{{ url("/api") }}';
+    }
+    if (typeof window.API_TOKEN === 'undefined') {
+        window.API_TOKEN = document.querySelector('meta[name="api-token"]')?.getAttribute('content') || '';
+    }
+    if (typeof window.USER_ROLE === 'undefined') {
+        window.USER_ROLE = '{{ $user->role->slug ?? "" }}';
+    }
+    const LEAD_ID = {{ $lead->id }};
+    const LEAD_INTERESTED_PROJECTS = @json($uniqueProjectNames ?? []);
+    const CAN_TRANSFER_OWNER = @json($user && ($user->isAdmin() || $user->isCrm()));
+
+    // Modal open/close functions
+    function openCallModal() {
+        document.getElementById('callModal').classList.remove('hidden');
+        // Set default start time to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.querySelector('#callForm input[name="start_time"]').value = now.toISOString().slice(0, 16);
+    }
+
+    function closeCallModal() {
+        document.getElementById('callModal').classList.add('hidden');
+        document.getElementById('callForm').reset();
+    }
+
+    function openFollowupModal() {
+        document.getElementById('followupModal').classList.remove('hidden');
+        // Set default scheduled time to tomorrow same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        document.querySelector('#followupForm input[name="scheduled_at"]').value = tomorrow.toISOString().slice(0, 16);
+    }
+
+    function closeFollowupModal() {
+        document.getElementById('followupModal').classList.add('hidden');
+        document.getElementById('followupForm').reset();
+    }
+
+    function openSiteVisitModal() {
+        document.getElementById('siteVisitModal').classList.remove('hidden');
+        // Set default scheduled time to tomorrow same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        // Initialize project tags
+        initializeSiteVisitProjectTags();
+        document.querySelector('#siteVisitForm input[name="scheduled_at"]').value = tomorrow.toISOString().slice(0, 16);
+    }
+
+    function closeSiteVisitModal() {
+        document.getElementById('siteVisitModal').classList.add('hidden');
+        document.getElementById('siteVisitForm').reset();
+        // Clear project tags
+        const container = document.getElementById('siteVisitProjectTagsContainer');
+        if (container) {
+            container.innerHTML = '';
+        }
+        const hiddenInput = document.getElementById('siteVisitProjectHidden');
+        if (hiddenInput) {
+            hiddenInput.value = '';
+        }
+    }
+
+    // Initialize project tags with lead's interested projects
+    function initializeSiteVisitProjectTags() {
+        const container = document.getElementById('siteVisitProjectTagsContainer');
+        const hiddenInput = document.getElementById('siteVisitProjectHidden');
+        
+        if (!container || !hiddenInput) return;
+        
+        // Clear existing tags
+        container.innerHTML = '';
+        
+        // Add lead's interested projects as tags
+        if (LEAD_INTERESTED_PROJECTS && Array.isArray(LEAD_INTERESTED_PROJECTS)) {
+            LEAD_INTERESTED_PROJECTS.forEach(projectName => {
+                if (projectName && projectName.trim()) {
+                    addSiteVisitProjectTag(projectName.trim());
+                }
+            });
+        }
+        
+        // Add Enter key handler to input
+        const input = document.getElementById('siteVisitProjectInput');
+        if (input) {
+            // Remove any existing event listeners by cloning the input
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            
+            newInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value) {
+                        addSiteVisitProjectTag(value);
+                        this.value = '';
+                    }
+                }
+            });
+        }
+    }
+
+    // Add a project tag
+    function addSiteVisitProjectTag(tagName) {
+        const container = document.getElementById('siteVisitProjectTagsContainer');
+        const hiddenInput = document.getElementById('siteVisitProjectHidden');
+        
+        if (!container || !hiddenInput) return;
+        
+        // Check if tag already exists
+        const existingTags = Array.from(container.querySelectorAll('.site-visit-project-tag-text'));
+        const tagExists = existingTags.some(tag => tag.textContent.trim() === tagName.trim());
+        
+        if (tagExists) {
+            return; // Don't add duplicate
+        }
+        
+        // Create tag element
+        const tagElement = document.createElement('span');
+        tagElement.className = 'site-visit-project-tag';
+        tagElement.innerHTML = `
+            <span class="site-visit-project-tag-text">${escapeHtml(tagName)}</span>
+            <span class="site-visit-project-tag-remove" onclick="removeSiteVisitProjectTag(this)">×</span>
+        `;
+        
+        container.appendChild(tagElement);
+        
+        // Update hidden input with comma-separated values
+        updateSiteVisitProjectHiddenInput();
+    }
+
+    // Remove a project tag
+    function removeSiteVisitProjectTag(element) {
+        const tagElement = element.closest('.site-visit-project-tag');
+        if (tagElement) {
+            tagElement.remove();
+            updateSiteVisitProjectHiddenInput();
+        }
+    }
+
+    // Update hidden input with comma-separated project names
+    function updateSiteVisitProjectHiddenInput() {
+        const container = document.getElementById('siteVisitProjectTagsContainer');
+        const hiddenInput = document.getElementById('siteVisitProjectHidden');
+        
+        if (!container || !hiddenInput) return;
+        
+        const tags = Array.from(container.querySelectorAll('.site-visit-project-tag-text'));
+        const projectNames = tags.map(tag => tag.textContent.trim()).filter(name => name);
+        hiddenInput.value = projectNames.join(', ');
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    async function openMeetingModal() {
+        document.getElementById('meetingModal').classList.remove('hidden');
+        
+        // Set default scheduled time to tomorrow same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        document.querySelector('#meetingForm input[name="scheduled_at"]').value = tomorrow.toISOString().slice(0, 16);
+        
+        // Fetch meeting history to auto-suggest sequence
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/sales-manager/leads/${LEAD_ID}/meeting-history`, {
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Accept': 'application/json',
+                }
+            });
+            
+            if (response.ok) {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const result = await response.json();
+                    document.getElementById('meeting_sequence').value = result.next_sequence || 1;
+                } else {
+                    console.warn('Non-JSON response for meeting history');
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load meeting history:', error);
+            // Default to 1 if fetch fails
+            document.getElementById('meeting_sequence').value = 1;
+        }
+    }
+
+    function closeMeetingModal() {
+        document.getElementById('meetingModal').classList.add('hidden');
+        document.getElementById('meetingForm').reset();
+        toggleMeetingModeFields(); // Reset to default (offline)
+    }
+
+    function toggleMeetingModeFields() {
+        const mode = document.querySelector('input[name="meeting_mode"]:checked').value;
+        const onlineFields = document.getElementById('onlineFields');
+        const offlineFields = document.getElementById('offlineFields');
+        const locationInput = document.getElementById('location_input');
+        const meetingLinkInput = document.querySelector('input[name="meeting_link"]');
+        
+        if (mode === 'online') {
+            onlineFields.style.display = 'block';
+            offlineFields.style.display = 'none';
+            locationInput.removeAttribute('required');
+            if (meetingLinkInput) {
+                meetingLinkInput.removeAttribute('required');
+            }
+        } else {
+            onlineFields.style.display = 'none';
+            offlineFields.style.display = 'block';
+            locationInput.setAttribute('required', 'required');
+            if (meetingLinkInput) {
+                meetingLinkInput.removeAttribute('required');
+            }
+        }
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleMeetingModeFields();
+    });
+
+    function openScheduleCallTaskModal() {
+        document.getElementById('scheduleCallTaskModal').classList.remove('hidden');
+        // Set default scheduled time to tomorrow same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        document.querySelector('#scheduleCallTaskForm input[name="scheduled_at"]').value = tomorrow.toISOString().slice(0, 16);
+    }
+
+    function closeScheduleCallTaskModal() {
+        document.getElementById('scheduleCallTaskModal').classList.add('hidden');
+        document.getElementById('scheduleCallTaskForm').reset();
+    }
+
+    function openOwnerTransferModal() {
+        if (!CAN_TRANSFER_OWNER) return;
+        const modal = document.getElementById('ownerTransferModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeOwnerTransferModal() {
+        const modal = document.getElementById('ownerTransferModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        const form = document.getElementById('ownerTransferForm');
+        if (form) {
+            form.reset();
+            const createCheckbox = document.getElementById('ownerTransferCreateCallingTask');
+            if (createCheckbox) {
+                createCheckbox.checked = true;
+            }
+        }
+    }
+
+    // Form submission functions
+    async function submitCall(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = {
+            lead_id: LEAD_ID,
+            phone_number: formData.get('phone_number'),
+            call_type: formData.get('call_type'),
+            start_time: new Date(formData.get('start_time')).toISOString(),
+            duration: parseInt(formData.get('duration')),
+            call_outcome: formData.get('call_outcome') || null,
+            notes: formData.get('notes') || null,
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/call-logs`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                alert('Server error: Invalid response format. Please try again.');
+                return;
+            }
+
+            if (response.ok && result.success) {
+                alert('Call logged successfully!');
+                closeCallModal();
+                location.reload(); // Reload to show in timeline
+            } else {
+                alert(result.message || 'Failed to log call');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while logging the call');
+        }
+    }
+
+    async function submitFollowup(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = {
+            lead_id: LEAD_ID,
+            type: formData.get('type'),
+            notes: formData.get('notes'),
+            scheduled_at: new Date(formData.get('scheduled_at')).toISOString(),
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/follow-ups`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                alert('Server error: Invalid response format. Please try again.');
+                return;
+            }
+
+            if (response.ok) {
+                alert('Follow-up scheduled successfully!');
+                closeFollowupModal();
+                location.reload(); // Reload to show in timeline
+            } else {
+                alert(result.message || 'Failed to schedule follow-up');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while scheduling the follow-up');
+        }
+    }
+
+    async function submitSiteVisit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = {
+            lead_id: LEAD_ID,
+            scheduled_at: new Date(formData.get('scheduled_at')).toISOString(),
+            project: document.getElementById('siteVisitProjectHidden').value || null,
+            visit_notes: formData.get('visit_notes') || null,
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/site-visits`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                if (typeof showNotification === 'function') {
+                    showNotification('Server error: Invalid response format. Please try again.', 'error', 3000);
+                } else {
+                    alert('Server error: Invalid response format. Please try again.');
+                }
+                return;
+            }
+
+            if (response.ok && result.success) {
+                if (typeof showNotification === 'function') {
+                    showNotification('Site visit scheduled successfully!', 'success', 3000);
+                } else {
+                    alert('Site visit scheduled successfully!');
+                }
+                closeSiteVisitModal();
+                setTimeout(() => {
+                    location.reload(); // Reload to show in timeline
+                }, 1500);
+            } else {
+                if (typeof showNotification === 'function') {
+                    showNotification(result.message || 'Failed to schedule site visit', 'error', 3000);
+                } else {
+                    alert(result.message || 'Failed to schedule site visit');
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while scheduling the site visit');
+        }
+    }
+
+    async function submitMeeting(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const data = {
+            lead_id: LEAD_ID,
+            meeting_sequence: parseInt(formData.get('meeting_sequence')),
+            scheduled_at: new Date(formData.get('scheduled_at')).toISOString(),
+            meeting_mode: formData.get('meeting_mode'),
+            meeting_link: formData.get('meeting_link') || null,
+            location: formData.get('location') || null,
+            reminder_enabled: formData.get('reminder_enabled') === 'on',
+            reminder_minutes: 5,
+            meeting_notes: formData.get('meeting_notes') || null,
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/sales-manager/meetings/quick-schedule-with-reminder`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                alert('Server error: Invalid response format. Please try again.');
+                return;
+            }
+
+            if (response.ok && (result.success !== false)) {
+                const message = 'Meeting scheduled successfully!' + (data.reminder_enabled ? ' You will get a reminder 5 minutes before.' : '');
+                showSuccessPopup(message);
+                closeMeetingModal();
+                setTimeout(() => {
+                    location.reload(); // Reload to show in timeline
+                }, 2000);
+            } else {
+                // Show detailed error message
+                let errorMsg = result.message || 'Failed to schedule meeting';
+                if (result.errors) {
+                    const errorList = Object.values(result.errors).flat().join('\n');
+                    errorMsg += '\n\n' + errorList;
+                } else if (result.error) {
+                    errorMsg += '\n\n' + result.error;
+                }
+                alert(errorMsg);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while scheduling the meeting. Please check console for details.');
+        }
+    }
+
+    async function submitScheduleCallTask(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = {
+            lead_id: LEAD_ID,
+            scheduled_at: new Date(formData.get('scheduled_at')).toISOString(),
+            notes: formData.get('notes') || null,
+        };
+
+        try {
+            // Determine the correct API endpoint based on user role
+            let endpoint;
+            if (window.USER_ROLE === 'telecaller') {
+                endpoint = `${window.API_BASE_URL}/telecaller/tasks/schedule-call`;
+            } else {
+                // For sales managers, sales executives, and others, use sales-manager endpoint
+                endpoint = `${window.API_BASE_URL}/sales-manager/tasks/schedule-call`;
+            }
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                alert('Server error: Invalid response format. Please try again.');
+                return;
+            }
+
+            if (response.ok && result.success) {
+                // Show success message with button to go to task section
+                closeScheduleCallTaskModal();
+                
+                // Determine task route based on user role
+                let taskRoute = '#';
+                if (window.USER_ROLE === 'telecaller') {
+                    taskRoute = '{{ route("telecaller.tasks") }}';
+                } else if (window.USER_ROLE === 'sales_manager' || window.USER_ROLE === 'sales_executive') {
+                    @php
+                        try {
+                            $tasksRoute = route('sales-manager.tasks');
+                        } catch (\Exception $e) {
+                            $tasksRoute = '/sales-manager/tasks';
+                        }
+                    @endphp
+                    taskRoute = '{{ $tasksRoute }}';
+                } else {
+                    // For other roles, try to construct the URL
+                    taskRoute = '/sales-manager/tasks';
+                }
+                
+                // Create success message with button
+                const successMessage = `
+                    <div id="taskSuccessMessage" style="position: fixed; top: 20px; right: 20px; z-index: 10000; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); min-width: 320px; max-width: 400px; animation: slideInRight 0.3s ease-out;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold;">
+                                ✓
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Task Created Successfully!</div>
+                                <div style="font-size: 14px; opacity: 0.9;">Call task has been scheduled.</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="document.getElementById('taskSuccessMessage').remove(); window.location.href='${taskRoute}';" style="flex: 1; background: white; color: #059669; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                Go to Task Section
+                            </button>
+                            <button onclick="document.getElementById('taskSuccessMessage').remove(); location.reload();" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.2)';">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes slideInRight {
+                            from {
+                                transform: translateX(100%);
+                                opacity: 0;
+                            }
+                            to {
+                                transform: translateX(0);
+                                opacity: 1;
+                            }
+                        }
+                    </style>
+                `;
+                
+                // Insert success message
+                document.body.insertAdjacentHTML('beforeend', successMessage);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    const msg = document.getElementById('taskSuccessMessage');
+                    if (msg) msg.remove();
+                }, 10000);
+            } else {
+                // Show detailed error message
+                let errorMsg = result.message || 'Failed to schedule call task';
+                if (result.errors) {
+                    const errorDetails = Object.values(result.errors).flat().join(', ');
+                    errorMsg += ': ' + errorDetails;
+                }
+                
+                console.error('Task creation error:', result);
+                console.error('Response status:', response.status);
+                console.error('Response body:', result);
+                
+                if (typeof showNotification === 'function') {
+                    showNotification(errorMsg, 'error', 5000);
+                } else {
+                    alert(errorMsg);
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            if (typeof showNotification === 'function') {
+                showNotification('An error occurred while scheduling the call task', 'error', 3000);
+            } else {
+                alert('An error occurred while scheduling the call task');
+            }
+        }
+    }
+
+    async function submitOwnerTransfer(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const assignedToRaw = formData.get('assigned_to');
+        if (!assignedToRaw) {
+            alert('Please select new owner');
+            return;
+        }
+
+        const payload = {
+            assigned_to: parseInt(assignedToRaw, 10),
+            create_calling_task: formData.get('create_calling_task') === 'on',
+            transfer_existing_tasks: true,
+            notes: (formData.get('notes') || '').trim() || null,
+        };
+
+        try {
+            const response = await fetch(`${window.API_BASE_URL}/leads/${LEAD_ID}/assign`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${window.API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const contentType = response.headers.get('content-type') || '';
+            const result = contentType.includes('application/json') ? await response.json() : {};
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to transfer lead owner');
+            }
+
+            alert('Lead owner changed successfully.');
+            closeOwnerTransferModal();
+            location.reload();
+        } catch (error) {
+            console.error('Owner transfer error:', error);
+            alert(error.message || 'Unable to transfer lead owner');
+        }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const callModal = document.getElementById('callModal');
+        const followupModal = document.getElementById('followupModal');
+        const siteVisitModal = document.getElementById('siteVisitModal');
+        const meetingModal = document.getElementById('meetingModal');
+        const scheduleCallTaskModal = document.getElementById('scheduleCallTaskModal');
+
+        if (event.target === callModal) {
+            closeCallModal();
+        }
+        if (event.target === followupModal) {
+            closeFollowupModal();
+        }
+        if (event.target === siteVisitModal) {
+            closeSiteVisitModal();
+        }
+        if (event.target === meetingModal) {
+            closeMeetingModal();
+        }
+        if (event.target === scheduleCallTaskModal) {
+            closeScheduleCallTaskModal();
+        }
+        const ownerTransferModal = document.getElementById('ownerTransferModal');
+        if (event.target === ownerTransferModal) {
+            closeOwnerTransferModal();
+        }
+    }
+
+    // Animated Success Popup
+    function showSuccessPopup(message) {
+        // Create popup if it doesn't exist
+        let popup = document.getElementById('successPopup');
+        if (!popup) {
+            popup = document.createElement('div');
+            popup.id = 'successPopup';
+            popup.className = 'fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none';
+            popup.innerHTML = `
+                <div class="bg-black bg-opacity-50 fixed inset-0 pointer-events-auto" id="successPopupOverlay"></div>
+                <div id="successPopupContent" class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-0 pointer-events-auto relative z-10">
+                    <div class="flex flex-col items-center">
+                        <div class="success-tick-container w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center mb-4 shadow-lg">
+                            <svg class="success-tick" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="24" cy="24" r="22" stroke="white" stroke-width="3" class="tick-circle"/>
+                                <path d="M14 24 L20 30 L34 16" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="tick-path" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Success!</h3>
+                        <p class="text-gray-600 text-center">${message}</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        // Update message
+        const messageEl = popup.querySelector('p');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+
+        // Show popup with animation
+        popup.style.display = 'flex';
+        const content = document.getElementById('successPopupContent');
+        content.style.transform = 'scale(0)';
+        content.style.opacity = '0';
+
+        // Trigger animation
+        setTimeout(() => {
+            content.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            content.style.transform = 'scale(1)';
+            content.style.opacity = '1';
+        }, 10);
+
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+            content.style.transition = 'all 0.3s ease-in';
+            content.style.transform = 'scale(0.8)';
+            content.style.opacity = '0';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+        }, 2000);
+    }
+</script>
+
+<style>
+    @keyframes tickDraw {
+        0% {
+            stroke-dasharray: 0, 100;
+            stroke-dashoffset: 0;
+        }
+        100% {
+            stroke-dasharray: 100, 0;
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes tickScale {
+        0% {
+            transform: scale(0);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes circleDraw {
+        0% {
+            stroke-dasharray: 0, 138;
+            stroke-dashoffset: 0;
+        }
+        100% {
+            stroke-dasharray: 138, 0;
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .success-tick-container {
+        animation: tickScale 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .success-tick .tick-circle {
+        stroke-dasharray: 0, 138;
+        animation: circleDraw 0.6s ease-out forwards;
+    }
+
+    .success-tick .tick-path {
+        stroke-dasharray: 0, 30;
+        animation: tickDraw 0.4s ease-out 0.3s forwards;
+    }
+</style>
+
+</script>
+

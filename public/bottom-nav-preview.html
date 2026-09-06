@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bottom Navigation UI Preview - Admin/CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #F7F6F3; min-height: 100vh; padding-bottom: 80px; }
+        .preview-header {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .preview-header h1 { font-size: 20px; color: #063A1C; margin-bottom: 4px; }
+        .preview-header p { font-size: 12px; color: #B3B5B4; }
+        .preview-content {
+            background: white;
+            padding: 24px;
+            margin: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .preview-content p { color: #666; font-size: 14px; line-height: 1.6; }
+        .note { background: #e8f5e9; border-left: 4px solid #205A44; padding: 12px; margin-top: 16px; border-radius: 4px; font-size: 13px; color: #2e7d32; }
+        /* Bottom Navigation - same as app */
+        #mobileFooterNav {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 8px 0;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+        }
+        .footer-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #666;
+            padding: 6px 4px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 72px;
+        }
+        .footer-nav-link i { font-size: 18px; margin-bottom: 2px; }
+        .footer-nav-link span { font-size: 9px; color: #666; text-align: center; line-height: 1.2; }
+        .footer-nav-link:hover, .footer-nav-link.active {
+            background: #F7F6F3;
+            color: #063A1C;
+        }
+        .footer-nav-link.active span { color: #063A1C; }
+    </style>
+</head>
+<body>
+    <div class="preview-header">
+        <h1>Bottom Navigation UI Preview</h1>
+        <p>Admin / CRM layout – navigation niche (mobile view)</p>
+    </div>
+    <div class="preview-content">
+        <p>Yeh wahi bottom bar hai jo ab Admin aur CRM panel mein mobile par dikhega. Desktop par left sidebar rahega; chhote screen par sidebar hide hoga aur yeh bar niche fixed rahegi.</p>
+        <div class="note">
+            <strong>Check karne ke liye:</strong> Browser window ko chhota karein (width &lt; 768px) ya mobile view mein khol kar Admin/CRM login karein – niche yeh navigation bar dikhegi.
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Admin style) -->
+    <nav id="mobileFooterNav">
+        <a href="#" class="footer-nav-link active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="footer-nav-link">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="#" class="footer-nav-link">
+            <i class="fas fa-user-friends"></i>
+            <span>Leads</span>
+        </a>
+        <a href="#" class="footer-nav-link">
+            <i class="fas fa-download"></i>
+            <span>Export</span>
+        </a>
+        <a href="#" class="footer-nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+        <a href="#" class="footer-nav-link">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+</html>

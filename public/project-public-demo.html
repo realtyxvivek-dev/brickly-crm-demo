@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Public Page Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f1e8;
+            --surface: rgba(255, 252, 246, 0.88);
+            --surface-strong: #fffaf1;
+            --ink: #1d1d1b;
+            --muted: #6d685f;
+            --line: rgba(29, 29, 27, 0.1);
+            --accent: #205A44;
+            --accent-deep: #063A1C;
+            --forest: #063A1C;
+            --warm: #dfe9e3;
+            --shadow: 0 18px 50px rgba(38, 26, 12, 0.12);
+            --radius: 28px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", "Aptos", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(32, 90, 68, 0.13), transparent 28%),
+                radial-gradient(circle at 85% 20%, rgba(6, 58, 28, 0.12), transparent 24%),
+                linear-gradient(180deg, #f8f4ec 0%, #f2ede4 52%, #efe7db 100%);
+        }
+
+        h1, h2, h3, .serif {
+            font-family: "Manrope", "Aptos", sans-serif;
+            letter-spacing: -0.04em;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .shell {
+            width: min(1240px, calc(100vw - 32px));
+            margin: 0 auto;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(18px);
+            background: rgba(245, 241, 232, 0.8);
+            border-bottom: 1px solid rgba(29, 29, 27, 0.06);
+        }
+
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 76px;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+            position: relative;
+        }
+
+        .brand-mark::before,
+        .brand-mark::after {
+            content: "";
+            position: absolute;
+            bottom: 8px;
+            width: 5px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.92);
+        }
+
+        .brand-mark::before {
+            left: 12px;
+            height: 18px;
+        }
+
+        .brand-mark::after {
+            left: 22px;
+            height: 26px;
+        }
+
+        .brand-meta small {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+        }
+
+        .brand-meta strong {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.55);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 999px;
+            border: 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            color: #fff;
+            box-shadow: 0 14px 30px rgba(6, 58, 28, 0.22);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.78);
+            color: var(--ink);
+            border: 1px solid var(--line);
+        }
+
+        .hero {
+            padding: 34px 0 18px;
+        }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 36px;
+            background:
+                radial-gradient(circle at 14% 18%, rgba(255,255,255,0.2), transparent 20%),
+                linear-gradient(135deg, rgba(6, 58, 28, 0.94), rgba(32, 90, 68, 0.84)),
+                linear-gradient(120deg, #205A44, #063A1C);
+            color: #fff7ee;
+            box-shadow: var(--shadow);
+            padding: 28px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 0.85fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            color: rgba(255, 247, 238, 0.76);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 12px;
+            margin-bottom: 18px;
+        }
+
+        .hero-copy h1 {
+            margin: 0 0 10px;
+            font-size: clamp(38px, 5vw, 68px);
+            line-height: 0.92;
+            max-width: 9ch;
+            font-weight: 800;
+        }
+
+        .hero-copy p {
+            margin: 0;
+            max-width: 52ch;
+            color: rgba(255, 247, 238, 0.82);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 22px 0 26px;
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .metric {
+            padding: 14px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.12);
+            min-height: 94px;
+        }
+
+        .metric span {
+            display: block;
+            color: rgba(255, 247, 238, 0.62);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .metric strong {
+            display: block;
+            margin-top: 10px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .hero-visual {
+            display: grid;
+            grid-template-rows: 1.15fr 0.85fr;
+            gap: 12px;
+            min-height: 500px;
+        }
+
+        .visual-main,
+        .visual-sub {
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            background:
+                linear-gradient(180deg, rgba(6, 58, 28, 0.06), rgba(6, 58, 28, 0.48)),
+                url("https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1400&q=80") center/cover;
+        }
+
+        .visual-main::before,
+        .visual-sub::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, transparent 0%, rgba(16, 20, 18, 0.14) 100%),
+                radial-gradient(circle at 70% 15%, rgba(255,255,255,0.7), transparent 24%),
+                linear-gradient(135deg, rgba(255,255,255,0.24), transparent 48%);
+        }
+
+        .visual-main::after {
+            content: "";
+            position: absolute;
+            inset: auto 8% 0 8%;
+            height: 54%;
+            border-radius: 24px 24px 0 0;
+            background:
+                linear-gradient(90deg, rgba(52,66,58,0.18) 0 6%, transparent 6% 20%, rgba(52,66,58,0.18) 20% 26%, transparent 26% 78%, rgba(52,66,58,0.18) 78% 84%, transparent 84% 100%),
+                linear-gradient(180deg, rgba(255,255,255,0.9), rgba(234,223,210,0.97));
+            box-shadow: 0 0 0 1px rgba(73, 48, 32, 0.08);
+        }
+
+        .visual-label {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(17, 24, 21, 0.58);
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .visual-ribbon {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .visual-ribbon span {
+            width: fit-content;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,250,241,0.92);
+            color: #1e2a24;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .visual-sub {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            background:
+                linear-gradient(180deg, rgba(6, 58, 28, 0.08), rgba(6, 58, 28, 0.45)),
+                url("https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1200&q=80") center/cover;
+        }
+
+        .thumb {
+            position: relative;
+            overflow: hidden;
+            border-radius: 22px;
+            min-height: 160px;
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=900&q=80") center/cover;
+        }
+
+        .thumb:nth-child(2) {
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80") center/cover;
+        }
+
+        .thumb:nth-child(3) {
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80") center/cover;
+        }
+
+        .thumb:nth-child(4) {
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80") center/cover;
+        }
+
+        .thumb strong {
+            position: absolute;
+            left: 16px;
+            bottom: 14px;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .overview {
+            padding: 28px 0 14px;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .section-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+        }
+
+        .section-card.pad {
+            padding: 24px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .summary-item {
+            padding: 18px 0 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .summary-item span {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 10px;
+        }
+
+        .summary-item strong {
+            font-size: 20px;
+        }
+
+        .insight-card {
+            position: sticky;
+            top: 102px;
+            padding: 22px;
+            background: linear-gradient(180deg, rgba(255,250,241,0.98), rgba(248,240,229,0.98));
+        }
+
+        .advisor-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .advisor-copy {
+            color: var(--muted);
+            line-height: 1.65;
+            margin: 10px 0 18px;
+            font-size: 14px;
+        }
+
+        .advisor-meta {
+            display: grid;
+            gap: 10px;
+            margin: 0 0 18px;
+            padding: 14px 16px;
+            border-radius: 20px;
+            background: rgba(32, 90, 68, 0.08);
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 22px;
+            padding: 8px 0 54px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .section-head h2 {
+            margin: 0;
+            font-size: clamp(30px, 3.4vw, 48px);
+            font-weight: 800;
+        }
+
+        .section-head p {
+            margin: 8px 0 0;
+            max-width: 52ch;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .feature {
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.44);
+            border: 1px solid rgba(29, 29, 27, 0.07);
+        }
+
+        .feature strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 19px;
+        }
+
+        .feature p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .tabs {
+            display: inline-flex;
+            gap: 8px;
+            padding: 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.65);
+            border: 1px solid var(--line);
+        }
+
+        .tab-btn {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            padding: 12px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: var(--ink);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.06);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: rise 320ms ease;
+        }
+
+        .unit-shell {
+            border: 1px solid rgba(29,29,27,0.12);
+            border-radius: 26px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.72);
+        }
+
+        .unit-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(29,29,27,0.1);
+            background: rgba(255,251,245,0.9);
+        }
+
+        .segmented {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 0;
+            border: 1px solid rgba(29,29,27,0.14);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .segmented button {
+            border: 0;
+            background: transparent;
+            padding: 14px 22px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            border-right: 1px solid rgba(29,29,27,0.12);
+        }
+
+        .segmented button:last-child {
+            border-right: 0;
+        }
+
+        .segmented button.active {
+            box-shadow: inset 0 -3px 0 var(--accent);
+            color: var(--accent-deep);
+        }
+
+        .unit-size-row {
+            padding: 0 18px;
+            border-bottom: 1px solid rgba(29,29,27,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            background: rgba(255,255,255,0.68);
+        }
+
+        .size-tabs {
+            display: inline-flex;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .size-tabs button {
+            border: 0;
+            background: transparent;
+            padding: 16px 0 14px;
+            font-size: 24px;
+            font-family: "Manrope", "Aptos", sans-serif;
+            font-weight: 700;
+            color: #a29889;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .size-tabs button.active {
+            color: var(--ink);
+        }
+
+        .size-tabs button.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 3px;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        .unit-switch {
+            display: inline-flex;
+            gap: 8px;
+            padding: 6px;
+            border-radius: 999px;
+            background: rgba(32,90,68,0.1);
+        }
+
+        .unit-switch button {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            padding: 10px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .unit-switch button.active {
+            background: #fff;
+            color: var(--ink);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+        }
+
+        .unit-detail {
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            min-height: 380px;
+        }
+
+        .unit-stats {
+            padding: 24px 28px;
+            display: grid;
+            gap: 20px;
+            align-content: start;
+            border-right: 1px solid rgba(29,29,27,0.1);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 16px;
+        }
+
+        .stat-box small {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .stat-box strong {
+            font-size: 18px;
+        }
+
+        .plan-visual {
+            position: relative;
+            padding: 26px;
+            background: linear-gradient(180deg, rgba(255,251,245,0.85), rgba(246,236,223,0.9));
+            display: grid;
+            place-items: center;
+        }
+
+        .plan-frame {
+            width: min(100%, 420px);
+            aspect-ratio: 1.18;
+            border: 1px solid rgba(29,29,27,0.08);
+            border-radius: 18px;
+            background:
+                linear-gradient(90deg, transparent 0 14%, rgba(32, 90, 68, 0.22) 14% 16%, transparent 16% 46%, rgba(32, 90, 68, 0.22) 46% 48%, transparent 48% 70%, rgba(32, 90, 68, 0.22) 70% 72%, transparent 72% 100%),
+                linear-gradient(180deg, transparent 0 18%, rgba(32, 90, 68, 0.22) 18% 20%, transparent 20% 52%, rgba(6, 58, 28, 0.18) 52% 54%, transparent 54% 100%),
+                linear-gradient(180deg, #fffdf9, #f8efe2);
+            box-shadow: inset 0 0 0 10px rgba(255,255,255,0.42);
+        }
+
+        .plan-note {
+            position: absolute;
+            left: 26px;
+            bottom: 22px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .pricing-board {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .price-plan {
+            padding: 18px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(252,245,235,0.86));
+            border: 1px solid rgba(29,29,27,0.08);
+        }
+
+        .price-plan small {
+            display: inline-flex;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(32, 90, 68, 0.12);
+            color: var(--accent-deep);
+            font-weight: 600;
+        }
+
+        .price-plan h3 {
+            margin: 14px 0 6px;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .price-plan ul {
+            list-style: none;
+            padding: 0;
+            margin: 18px 0 0;
+            display: grid;
+            gap: 12px;
+            color: var(--muted);
+        }
+
+        .media-board {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 12px;
+        }
+
+        .media-main {
+            min-height: 360px;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.1), rgba(6,58,28,0.52)),
+                url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80") center/cover;
+        }
+
+        .media-main::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, transparent 20%, rgba(12, 16, 14, 0.38) 100%),
+                radial-gradient(circle at 75% 18%, rgba(255,255,255,0.48), transparent 20%);
+        }
+
+        .media-main .overlay {
+            position: absolute;
+            inset: auto 24px 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .overlay-card {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        .media-side {
+            display: grid;
+            gap: 14px;
+        }
+
+        .mini-media {
+            min-height: 104px;
+            border-radius: 22px;
+            padding: 16px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: end;
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1000&q=80") center/cover;
+        }
+
+        .mini-media:nth-child(2) {
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1000&q=80") center/cover;
+        }
+
+        .mini-media:nth-child(3) {
+            background:
+                linear-gradient(180deg, rgba(6,58,28,0.08), rgba(6,58,28,0.45)),
+                url("https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1000&q=80") center/cover;
+        }
+
+        .amenity-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .amenity {
+            padding: 18px 12px;
+            text-align: center;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(29,29,27,0.07);
+        }
+
+        .amenity .icon {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 12px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            background: rgba(32, 90, 68, 0.1);
+            color: var(--forest);
+            font-weight: 700;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
+        }
+
+        .map-card {
+            min-height: 360px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px;
+            background:
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px) 0 0 / 48px 48px,
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px) 0 0 / 48px 48px,
+                linear-gradient(135deg, #efe7da, #e4dbc9);
+        }
+
+        .road {
+            position: absolute;
+            background: rgba(110, 114, 120, 0.34);
+            border-radius: 999px;
+        }
+
+        .road.a {
+            inset: 18% auto auto -6%;
+            width: 120%;
+            height: 10px;
+            transform: rotate(22deg);
+        }
+
+        .road.b {
+            inset: 50% auto auto -18%;
+            width: 118%;
+            height: 12px;
+            transform: rotate(-14deg);
+        }
+
+        .road.c {
+            inset: -8% auto auto 52%;
+            width: 10px;
+            height: 118%;
+        }
+
+        .distance-panel {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(29,29,27,0.08);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .distance-panel input {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: var(--ink);
+        }
+
+        .distance-panel button {
+            border: 0;
+            background: #fff;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        }
+
+        .marker {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            box-shadow: 0 0 0 6px rgba(32, 90, 68, 0.16);
+        }
+
+        .marker.home {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            box-shadow: 0 0 0 8px rgba(32, 90, 68, 0.14);
+        }
+
+        .location-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .loc {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.56);
+            border: 1px solid rgba(29,29,27,0.06);
+        }
+
+        .cta-band {
+            margin: 20px 0 70px;
+            padding: 28px;
+            border-radius: 34px;
+            background: linear-gradient(135deg, #205A44, #063A1C);
+            color: #fff8ef;
+            box-shadow: var(--shadow);
+        }
+
+        .cta-band-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .cta-band h2 {
+            margin: 0 0 8px;
+            font-size: clamp(28px, 3vw, 46px);
+        }
+
+        .cta-band p {
+            margin: 0;
+            max-width: 58ch;
+            color: rgba(255,248,239,0.78);
+        }
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(18px);
+            animation: rise 800ms ease forwards;
+        }
+
+        .delay-1 { animation-delay: 80ms; }
+        .delay-2 { animation-delay: 160ms; }
+        .delay-3 { animation-delay: 240ms; }
+
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1080px) {
+            .hero-grid,
+            .overview-grid,
+            .media-board,
+            .location-grid,
+            .cta-band-inner {
+                grid-template-columns: 1fr;
+                display: grid;
+            }
+
+            .hero-metrics,
+            .summary-grid,
+            .pricing-board,
+            .feature-grid,
+            .amenity-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-card {
+                position: static;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .shell {
+                width: min(100vw - 20px, 100%);
+            }
+
+            .topbar-inner,
+            .cta-band-inner {
+                display: grid;
+            }
+
+            .hero-card,
+            .section-card.pad,
+            .insight-card,
+            .cta-band {
+                padding: 20px;
+            }
+
+            .topbar {
+                position: static;
+            }
+
+            .topbar-inner {
+                gap: 14px;
+                padding: 14px 0;
+            }
+
+            .top-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .top-actions .btn,
+            .top-actions .chip {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .brand {
+                align-items: center;
+            }
+
+            .hero-copy h1 {
+                font-size: 34px;
+                max-width: 100%;
+            }
+
+            .hero-metrics,
+            .summary-grid,
+            .pricing-board,
+            .feature-grid,
+            .amenity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-sub {
+                grid-template-columns: 1fr;
+            }
+
+            .unit-toolbar,
+            .unit-size-row,
+            .unit-detail {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding-top: 18px;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .hero-visual {
+                min-height: auto;
+                grid-template-rows: 280px auto;
+            }
+
+            .visual-main {
+                min-height: 280px;
+            }
+
+            .visual-ribbon {
+                top: 12px;
+                left: 12px;
+                gap: 6px;
+            }
+
+            .visual-ribbon span {
+                font-size: 11px;
+                padding: 7px 10px;
+            }
+
+            .metric strong {
+                font-size: 20px;
+            }
+
+            .overview {
+                padding-top: 16px;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-card {
+                order: -1;
+            }
+
+            .advisor-row {
+                gap: 12px;
+            }
+
+            .section-head {
+                display: grid;
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .section-head h2 {
+                font-size: 26px;
+            }
+
+            .tabs {
+                width: 100%;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .unit-stats {
+                border-right: 0;
+                border-bottom: 1px solid rgba(29,29,27,0.1);
+                padding: 18px;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 14px 12px;
+            }
+
+            .segmented {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                width: 100%;
+                border-radius: 18px;
+            }
+
+            .segmented button {
+                padding: 12px 10px;
+                font-size: 14px;
+                border-right: 0;
+                border-bottom: 1px solid rgba(29,29,27,0.12);
+            }
+
+            .segmented button:nth-last-child(-n+1) {
+                border-bottom: 0;
+            }
+
+            .unit-toolbar {
+                padding: 14px;
+            }
+
+            .unit-size-row {
+                padding: 0 14px 10px;
+                gap: 12px;
+            }
+
+            .size-tabs {
+                gap: 16px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 2px;
+                scrollbar-width: none;
+            }
+
+            .size-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .size-tabs button {
+                white-space: nowrap;
+                font-size: 20px;
+                padding: 14px 0 12px;
+            }
+
+            .unit-switch {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .unit-switch button {
+                flex: 1;
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+
+            .unit-detail {
+                min-height: auto;
+            }
+
+            .plan-visual {
+                padding: 18px;
+                min-height: 260px;
+            }
+
+            .plan-note {
+                position: static;
+                margin-top: 12px;
+                text-align: center;
+            }
+
+            .tabs {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab-btn {
+                padding: 11px 10px;
+                font-size: 13px;
+            }
+
+            .media-main {
+                min-height: 240px;
+            }
+
+            .media-main .overlay {
+                inset: auto 16px 16px 16px;
+                display: grid;
+            }
+
+            .overlay-card,
+            .media-main .btn {
+                width: 100%;
+            }
+
+            .mini-media {
+                min-height: 88px;
+            }
+
+            .amenity {
+                padding: 16px 10px;
+            }
+
+            .amenity .icon {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 10px;
+            }
+
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .map-card {
+                min-height: 260px;
+            }
+
+            .distance-panel {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .distance-panel button {
+                width: 100%;
+            }
+
+            .loc {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+
+            .cta-band {
+                margin-bottom: 36px;
+            }
+
+            .cta-band h2 {
+                font-size: 24px;
+            }
+
+            .cta-band .top-actions {
+                display: grid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="shell topbar-inner">
+            <div class="brand">
+                <div class="brand-mark"></div>
+                <div class="brand-meta">
+                    <small>Advisor Share Demo</small>
+                    <strong>Mulberry Heights Public Page</strong>
+                </div>
+            </div>
+            <div class="top-actions">
+                <span class="chip">Shared by: Anjali Sharma</span>
+                <span class="chip">Customer tracked link active</span>
+                <a class="btn btn-primary" href="#cta">Share-ready layout</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="shell hero-card">
+                <div class="hero-grid">
+                    <div class="hero-copy fade-up">
+                        <div class="eyebrow">Lucknow / Sushant Golf City / Residential</div>
+                        <h1>Rishita Mulberry Heights</h1>
+                        <p>
+                            Advisor-shareable landing page concept. Simple structure, strong visuals, clear pricing,
+                            floor plans, video, 360 tour, and direct enquiry actions. Built for customer attention,
+                            not portal clutter.
+                        </p>
+
+                        <div class="hero-meta">
+                            <span class="chip">RERA Approved</span>
+                            <span class="chip">Possession Dec 2025</span>
+                            <span class="chip">2 & 3 BHK Residences</span>
+                        </div>
+
+                        <div class="top-actions">
+                            <button class="btn btn-primary">Request Price Sheet</button>
+                            <button class="btn btn-secondary">Schedule Site Visit</button>
+                        </div>
+
+                        <div class="hero-metrics fade-up delay-1">
+                            <div class="metric">
+                                <span>Starting Price</span>
+                                <strong>INR 1.07 Cr</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Size Range</span>
+                                <strong>833 - 1473 sq.ft</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Best For</span>
+                                <strong>End-use + Premium Living</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Top Hook</span>
+                                <strong>Low-density lifestyle</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-visual fade-up delay-2">
+                        <div class="visual-main">
+                            <div class="visual-ribbon">
+                                <span>Zero brokerage</span>
+                                <span>Best price guidance</span>
+                                <span>Live availability support</span>
+                            </div>
+                            <div class="visual-label">Hero render / gallery visual</div>
+                        </div>
+                        <div class="visual-sub">
+                            <div class="thumb"><strong>Image Gallery</strong></div>
+                            <div class="thumb"><strong>Floor Plan</strong></div>
+                            <div class="thumb"><strong>Club View</strong></div>
+                            <div class="thumb"><strong>360 Tour</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="overview">
+            <div class="shell overview-grid">
+                <div class="section-card pad fade-up">
+                <div class="section-head">
+                    <div>
+                        <h2>Project Snapshot</h2>
+                    </div>
+                </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span>Project Type</span>
+                            <strong>High Rise Apartment</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Project Size</span>
+                            <strong>21.45 Acres</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Towers</span>
+                            <strong>14 Premium Towers</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Highlight</span>
+                            <strong>Large central greens</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="section-card insight-card fade-up delay-1">
+                    <div class="advisor-row">
+                        <div class="avatar">AS</div>
+                        <div>
+                            <strong>Anjali Sharma</strong><br>
+                            <span style="color: var(--muted);">Senior Advisor • Property Desk</span>
+                        </div>
+                    </div>
+
+                    <p class="advisor-copy">
+                        Project details, price sheet, floor plans and visit support ke liye directly advisor se connect karein.
+                    </p>
+
+                    <div class="advisor-meta">
+                        <div>RERA guided assistance</div>
+                        <div>Live inventory support</div>
+                        <div>Site visit coordination available</div>
+                    </div>
+
+                    <div style="display:grid; gap:12px;">
+                        <button class="btn btn-primary" style="width:100%;">Call Advisor</button>
+                        <button class="btn btn-secondary" style="width:100%;">WhatsApp Advisor</button>
+                        <button class="btn btn-secondary" style="width:100%;">Book Visit</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="shell stack">
+            <div class="section-card pad fade-up">
+                <div class="feature-grid">
+                    <div class="feature">
+                        <strong>Project highlights</strong>
+                        <p>Large greens, lower density, premium positioning.</p>
+                    </div>
+                    <div class="feature">
+                        <strong>Who it suits</strong>
+                        <p>Best fit for end-use family buyers.</p>
+                    </div>
+                    <div class="feature">
+                        <strong>Why enquire now</strong>
+                        <p>Clear entry pricing and strong Golf City pull.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-card pad fade-up delay-1">
+                <div class="section-head">
+                    <div>
+                        <h2>Pricing & Configurations</h2>
+                    </div>
+                    <div class="tabs" role="tablist" aria-label="Project tabs">
+                        <button class="tab-btn active" data-tab="plans">Plans</button>
+                        <button class="tab-btn" data-tab="media">Media</button>
+                    </div>
+                </div>
+
+                <div class="tab-panel active" id="tab-plans">
+                    <div class="unit-shell">
+                        <div class="unit-toolbar">
+                            <div class="segmented" id="unitTypeTabs">
+                                <button class="active" data-unit="3 BHK">3 BHK</button>
+                                <button data-unit="3.5 BHK">3.5 BHK</button>
+                                <button data-unit="4 BHK">4 BHK</button>
+                                <button data-unit="4.5 BHK">4.5 BHK</button>
+                                <button data-unit="Penthouse">Penthouse</button>
+                            </div>
+                            <div class="unit-switch" id="areaUnitSwitch">
+                                <button class="active" data-measure="sqft">Sq. Ft.</button>
+                                <button data-measure="sqm">Sq. M.</button>
+                                <button data-measure="sqyd">Sq. Yd.</button>
+                            </div>
+                        </div>
+
+                        <div class="unit-size-row">
+                            <div class="size-tabs" id="sizeTabs">
+                                <button class="active" data-size-sqft="1107">1107</button>
+                                <button data-size-sqft="1326">1326</button>
+                                <button data-size-sqft="1489">1489</button>
+                                <button data-size-sqft="1674">1674</button>
+                                <button data-size-sqft="1840">1840</button>
+                            </div>
+                            <div style="color: var(--muted); font-weight: 600;" id="sizeLabel">Area options</div>
+                        </div>
+
+                        <div class="unit-detail">
+                            <div class="unit-stats">
+                                <div class="stat-grid">
+                                    <div class="stat-box">
+                                        <small>Price</small>
+                                        <strong id="unitPrice">INR 1.57 Cr</strong>
+                                    </div>
+                                    <div class="stat-box">
+                                        <small>Built-up Area</small>
+                                        <strong id="builtupValue">On Request</strong>
+                                    </div>
+                                    <div class="stat-box">
+                                        <small>Carpet Area</small>
+                                        <strong id="carpetValue">1107 Sq.ft.</strong>
+                                    </div>
+                                    <div class="stat-box">
+                                        <small>Property Type</small>
+                                        <strong id="propertyTypeValue">Apartment</strong>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                    <button class="btn btn-primary">Get Plan Image</button>
+                                    <button class="btn btn-secondary">Ask Price</button>
+                                </div>
+                            </div>
+                            <div class="plan-visual">
+                                <div class="plan-frame"></div>
+                                <div class="plan-note">Plan preview / request image</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-panel" id="tab-media">
+                    <div class="media-board">
+                        <div class="media-main">
+                            <div class="overlay">
+                                <div class="overlay-card">
+                                    <strong style="display:block; margin-bottom:4px;">Gallery / walkthrough</strong>
+                                </div>
+                                <button class="btn btn-primary">Watch Project Film</button>
+                            </div>
+                        </div>
+                        <div class="media-side">
+                            <div class="mini-media"><strong>Video walkthrough</strong></div>
+                            <div class="mini-media"><strong>360 immersive tour</strong></div>
+                            <div class="mini-media"><strong>Download brochure / price sheet</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-card pad fade-up delay-2">
+                <div class="section-head">
+                    <div>
+                        <h2>Amenities That Matter</h2>
+                    </div>
+                </div>
+                <div class="amenity-grid">
+                    <div class="amenity"><div class="icon">24</div><strong>Security</strong></div>
+                    <div class="amenity"><div class="icon">CL</div><strong>Clubhouse</strong></div>
+                    <div class="amenity"><div class="icon">GY</div><strong>Gym</strong></div>
+                    <div class="amenity"><div class="icon">SW</div><strong>Pool</strong></div>
+                    <div class="amenity"><div class="icon">PK</div><strong>Parking</strong></div>
+                    <div class="amenity"><div class="icon">GR</div><strong>Central Greens</strong></div>
+                </div>
+            </div>
+
+            <div class="section-card pad fade-up">
+                <div class="section-head">
+                    <div>
+                        <h2>Location Snapshot</h2>
+                    </div>
+                </div>
+                <div class="location-grid">
+                    <div>
+                        <div class="map-card">
+                            <div class="road a"></div>
+                            <div class="road b"></div>
+                            <div class="road c"></div>
+                            <div class="marker home" style="top: 44%; left: 50%;"></div>
+                            <div class="marker" style="top: 21%; left: 60%;"></div>
+                            <div class="marker" style="top: 37%; left: 30%;"></div>
+                            <div class="marker" style="top: 64%; left: 68%;"></div>
+                            <div class="marker" style="top: 58%; left: 18%;"></div>
+                            <div class="marker" style="top: 28%; left: 44%;"></div>
+                        </div>
+                        <div class="distance-panel">
+                            <input type="text" placeholder="Enter a location to check distance">
+                            <button>Show Distance</button>
+                        </div>
+                    </div>
+
+                    <div class="location-list">
+                        <div class="loc"><span>Medanta Hospital</span><strong>18 min</strong></div>
+                        <div class="loc"><span>Ekana Stadium</span><strong>14 min</strong></div>
+                        <div class="loc"><span>Golf City Mall Belt</span><strong>10 min</strong></div>
+                        <div class="loc"><span>Airport Access</span><strong>26 min</strong></div>
+                        <div class="loc"><span>School Cluster</span><strong>8 min</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="cta-band fade-up delay-1" id="cta">
+                <div class="cta-band-inner">
+                    <div>
+                        <h2>Minimal Public Page Direction</h2>
+                        <p>
+                            Agar ye cleaner direction sahi lage to next step me isi ko real project module ke saath map karenge:
+                            create form fields, public route, tracked share links, and event logging.
+                        </p>
+                    </div>
+                    <div class="top-actions">
+                        <button class="btn btn-primary">Approve This Style</button>
+                        <button class="btn btn-secondary">Need Simpler Version</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const buttons = document.querySelectorAll(".tab-btn");
+        const panels = document.querySelectorAll(".tab-panel");
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const target = button.dataset.tab;
+
+                buttons.forEach((btn) => btn.classList.remove("active"));
+                panels.forEach((panel) => panel.classList.remove("active"));
+
+                button.classList.add("active");
+                document.getElementById("tab-" + target).classList.add("active");
+            });
+        });
+
+        const measureButtons = document.querySelectorAll("#areaUnitSwitch button");
+        const sizeButtons = document.querySelectorAll("#sizeTabs button");
+        const unitButtons = document.querySelectorAll("#unitTypeTabs button");
+        const carpetValue = document.getElementById("carpetValue");
+        const sizeLabel = document.getElementById("sizeLabel");
+        const unitPrice = document.getElementById("unitPrice");
+        const propertyTypeValue = document.getElementById("propertyTypeValue");
+
+        let currentMeasure = "sqft";
+        let currentSizeSqft = 1107;
+        let currentUnit = "3 BHK";
+
+        const unitPrices = {
+            "3 BHK": "INR 1.57 Cr",
+            "3.5 BHK": "INR 1.76 Cr",
+            "4 BHK": "INR 2.04 Cr",
+            "4.5 BHK": "INR 2.28 Cr",
+            "Penthouse": "INR 3.12 Cr"
+        };
+
+        function convertArea(value, measure) {
+            if (measure === "sqm") return (value * 0.092903).toFixed(1) + " Sq.m.";
+            if (measure === "sqyd") return (value / 9).toFixed(1) + " Sq.yd.";
+            return value + " Sq.ft.";
+        }
+
+        function updateAreaDisplay() {
+            carpetValue.textContent = convertArea(currentSizeSqft, currentMeasure);
+            sizeLabel.textContent =
+                currentMeasure === "sqm" ? "Area in Sq. M." :
+                currentMeasure === "sqyd" ? "Area in Sq. Yd." :
+                "Area in Sq. Ft.";
+        }
+
+        measureButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                measureButtons.forEach((btn) => btn.classList.remove("active"));
+                button.classList.add("active");
+                currentMeasure = button.dataset.measure;
+                updateAreaDisplay();
+            });
+        });
+
+        sizeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                sizeButtons.forEach((btn) => btn.classList.remove("active"));
+                button.classList.add("active");
+                currentSizeSqft = Number(button.dataset.sizeSqft);
+                updateAreaDisplay();
+            });
+        });
+
+        unitButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                unitButtons.forEach((btn) => btn.classList.remove("active"));
+                button.classList.add("active");
+                currentUnit = button.dataset.unit;
+                unitPrice.textContent = unitPrices[currentUnit];
+                propertyTypeValue.textContent = currentUnit === "Penthouse" ? "Penthouse" : "Apartment";
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve real files/directories/symlinks from the app root directly.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -l
+    RewriteRule ^ - [L]
+
+    # If request matches a real file/folder inside /public, serve it.
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -d
+    RewriteRule ^(.+)$ public/$1 [L]
+
+    # Otherwise route everything to Laravel front controller.
+    RewriteRule ^ public/index.php [L]
+</IfModule>

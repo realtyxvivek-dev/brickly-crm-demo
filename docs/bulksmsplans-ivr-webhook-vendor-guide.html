@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BulkSMSPlans IVR Webhook Integration Guide</title>
+    <style>
+        :root {
+            --blue: #007aff;
+            --blue-dark: #0057b8;
+            --ink: #111827;
+            --muted: #667085;
+            --line: #dbe7f3;
+            --wash: #f5f9ff;
+            --panel: #ffffff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #f3f7fc;
+            color: var(--ink);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+        .page {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 32px 18px 48px;
+        }
+        .hero {
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: #fff;
+            padding: 30px;
+            box-shadow: 0 22px 48px rgba(0, 87, 184, 0.18);
+        }
+        .hero h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+        .hero p {
+            margin: 12px 0 0;
+            max-width: 720px;
+            color: rgba(255,255,255,.86);
+            font-size: 15px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .meta div {
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 16px;
+            background: rgba(255,255,255,.12);
+            padding: 12px;
+        }
+        .meta span {
+            display: block;
+            color: rgba(255,255,255,.66);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+        }
+        .meta strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .card {
+            margin-top: 18px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: var(--panel);
+            padding: 22px;
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
+        }
+        h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            letter-spacing: -0.01em;
+        }
+        h3 {
+            margin: 22px 0 8px;
+            font-size: 15px;
+        }
+        p { margin: 8px 0; color: var(--muted); }
+        ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+        li { margin: 6px 0; }
+        code {
+            border: 1px solid #d7e3f4;
+            border-radius: 8px;
+            background: #f7fbff;
+            color: #0f172a;
+            padding: 2px 6px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+        }
+        pre {
+            overflow-x: auto;
+            border: 1px solid #d7e3f4;
+            border-radius: 14px;
+            background: #0f172a;
+            color: #e5eefc;
+            padding: 16px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .endpoint {
+            display: block;
+            word-break: break-all;
+            border-radius: 14px;
+            background: var(--wash);
+            border: 1px solid var(--line);
+            padding: 14px;
+            font-weight: 700;
+            color: var(--blue-dark);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .note {
+            border-left: 4px solid var(--blue);
+            background: #eef6ff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #1e3a5f;
+        }
+        .bad {
+            border-left-color: #ef4444;
+            background: #fff1f2;
+            color: #7f1d1d;
+        }
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li::before {
+            content: "✓";
+            color: var(--blue);
+            font-weight: 900;
+            margin-right: 8px;
+        }
+        .footer {
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+        }
+        @media (max-width: 720px) {
+            .hero { padding: 22px; }
+            .hero h1 { font-size: 24px; }
+            .meta, .grid { grid-template-columns: 1fr; }
+            .page { padding: 18px 12px 34px; }
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="hero">
+        <h1>BulkSMSPlans IVR Webhook Integration</h1>
+        <p>This document explains how BulkSMSPlans should send IVR call events to Brickly CRM for Omaxe. The CRM will receive call details, match or create leads, save call logs, and attach call recordings.</p>
+        <div class="meta">
+            <div>
+                <span>Environment</span>
+                <strong>Production</strong>
+            </div>
+            <div>
+                <span>Method</span>
+                <strong>POST JSON</strong>
+            </div>
+            <div>
+                <span>Authentication</span>
+                <strong>Header Token</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Webhook Endpoint</h2>
+        <span class="endpoint">https://omaxe.bihtech.in/api/webhooks/bulksmsplans-ivr</span>
+        <div class="grid">
+            <div>
+                <h3>Required Method</h3>
+                <p><code>POST</code></p>
+            </div>
+            <div>
+                <h3>Required Content Type</h3>
+                <p><code>application/json</code></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Authentication</h2>
+        <p>The token must be sent in a request header. Query string tokens are not accepted.</p>
+
+        <h3>Preferred Header</h3>
+        <pre>X-IVR-Token: PASTE_TOKEN_HERE</pre>
+
+        <h3>Alternative Header</h3>
+        <pre>Authorization: Bearer PASTE_TOKEN_HERE</pre>
+
+        <div class="note bad">
+            Do not send the token like this: <code>?token=PASTE_TOKEN_HERE</code>. It will be rejected.
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Sample Request Payload</h2>
+        <p>Please send call data as JSON. These field names are supported by the CRM.</p>
+        <pre>{
+  "type": "ivr",
+  "id": "1654557",
+  "ivr_number": "7971900088",
+  "receiver_number": "917082439354",
+  "agent_number": "9713077701",
+  "group": "Omaxe Lincoln",
+  "status": "ANSWER",
+  "call_start_time": "2026-06-24 16:11:42",
+  "call_end_time": "2026-06-24 16:12:43",
+  "call_duration": 61,
+  "recording": "https://example.com/recording.wav"
+}</pre>
+    </section>
+
+    <section class="card">
+        <h2>Field Mapping</h2>
+        <ul>
+            <li><code>id</code> is used as the unique call ID. Duplicate call IDs will not create duplicate call logs.</li>
+            <li><code>receiver_number</code> is treated as the customer phone number.</li>
+            <li><code>agent_number</code> is matched with CRM user phone number.</li>
+            <li><code>status</code> should contain call result such as answered, missed, busy, no-answer, or similar values.</li>
+            <li><code>recording</code> should contain the call recording URL when available.</li>
+            <li><code>call_duration</code> should be sent in seconds.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Expected Responses</h2>
+        <h3>Success</h3>
+        <pre>{
+  "success": true,
+  "status": "success",
+  "message": "Webhook processed successfully."
+}</pre>
+
+        <h3>Invalid Token</h3>
+        <pre>{
+  "success": false,
+  "message": "Unauthorized: invalid token."
+}</pre>
+        <p>If this response is received, the request reached Brickly CRM, but the token was missing or did not match.</p>
+    </section>
+
+    <section class="card">
+        <h2>Current Issue To Check</h2>
+        <div class="note">
+            The CRM is receiving webhook hits, but recent hits are failing with <strong>Unauthorized: missing or invalid webhook token</strong>. This means the endpoint is reachable, but the token header is not matching.
+        </div>
+        <h3>Please verify from BulkSMSPlans side</h3>
+        <ul class="checklist">
+            <li>The exact webhook URL is being used.</li>
+            <li>The request method is POST.</li>
+            <li>The payload is JSON.</li>
+            <li>The token is sent in <code>X-IVR-Token</code> or <code>Authorization: Bearer</code>.</li>
+            <li>The token value has no extra spaces before or after it.</li>
+            <li>The token is not being sent in query string.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Information Requested From Vendor</h2>
+        <p>Please share one latest failed or test webhook request with:</p>
+        <ul>
+            <li>Request URL</li>
+            <li>Request method</li>
+            <li>All request headers, especially token header</li>
+            <li>JSON payload</li>
+            <li>Response status code</li>
+            <li>Response body returned by CRM</li>
+            <li>Timestamp of request</li>
+        </ul>
+    </section>
+
+    <p class="footer">Prepared for Brickly CRM IVR integration with BulkSMSPlans.</p>
+</main>
+</body>
+</html>
